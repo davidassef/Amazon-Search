@@ -9,8 +9,20 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>🛒 Amazon Product Scraper</h1>
-            <p>Search for products on Amazon and view the first page results</p>
+            <div class="header-content">
+                <div class="title-section">
+                    <h1 data-i18n="title">🛒 Amazon Product Scraper</h1>
+                    <p data-i18n="subtitle">Search for products on Amazon and view the first page results</p>
+                </div>
+                <div class="language-selector">
+                    <label for="languageSelect" data-i18n="language">Language:</label>
+                    <select id="languageSelect" class="language-select">
+                        <option value="en">🇺🇸 English</option>
+                        <option value="pt">🇧🇷 Português</option>
+                        <option value="es">🇪🇸 Español</option>
+                    </select>
+                </div>
+            </div>
         </header>
 
         <main class="main">
@@ -19,23 +31,24 @@
                     <input 
                         type="text" 
                         id="searchInput" 
+                        data-i18n-placeholder="searchPlaceholder"
                         placeholder="Enter product keyword (e.g., laptop, headphones, books...)"
                         class="search-input"
                     >
                     <button id="searchButton" class="search-button">
-                        <span class="button-text">Search Products</span>
+                        <span class="button-text" data-i18n="searchButton">Search Products</span>
                         <span class="loading-spinner" style="display: none;">🔄</span>
                     </button>
                 </div>
                 <div class="search-info">
-                    <small>Press Enter or click Search to find products</small>
+                    <small data-i18n="searchInfo">Press Enter or click Search to find products</small>
                 </div>
             </section>
 
             <section class="results-section">
                 <div id="loadingMessage" class="message loading-message" style="display: none;">
                     <div class="spinner"></div>
-                    <p>Scraping Amazon products...</p>
+                    <p data-i18n="loadingMessage">Scraping Amazon products...</p>
                 </div>
 
                 <div id="errorMessage" class="message error-message" style="display: none;">
@@ -44,7 +57,7 @@
 
                 <div id="resultsContainer" class="results-container" style="display: none;">
                     <div class="results-header">
-                        <h2>Search Results</h2>
+                        <h2 data-i18n="resultsTitle">Search Results</h2>
                         <div class="results-info">
                             <span id="resultsCount"></span>
                             <span id="searchKeyword"></span>
@@ -58,7 +71,7 @@
         </main>
 
         <footer class="footer">
-            <p>&copy; 2025 Amazon Product Scraper - Built with Bun & Vite</p>
+            <p data-i18n="footer">&copy; 2025 Amazon Product Scraper - Built with Bun & Vite</p>
         </footer>
     </div>
 
