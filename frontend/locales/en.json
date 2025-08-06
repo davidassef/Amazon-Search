@@ -1,0 +1,23 @@
+{
+  "title": "Amazon Product Scraper",
+  "subtitle": "Search for products on Amazon and view the first page results",
+  "searchPlaceholder": "Enter product keyword (e.g., laptop, headphones, books...)",
+  "searchButton": "Search Products",
+  "searchInfo": "Press Enter or click Search to find products",
+  "loadingMessage": "Scraping Amazon products...",
+  "errorMessage": "Failed to search products. Please try again.",
+  "noProductsError": "No products found for \"{{keyword}}\". Try a different search term.",
+  "keywordRequired": "Please enter a search keyword",
+  "keywordTooShort": "Search keyword must be at least 2 characters long",
+  "resultsTitle": "Search Results",
+  "resultsCount": "{{count}} products found",
+  "resultsKeyword": "for \"{{keyword}}\"",
+  "noRating": "No rating",
+  "noReviews": "No reviews",
+  "oneReview": "1 review",
+  "multipleReviews": "{{count}} reviews",
+  "noPrice": "Price not available",
+  "viewProduct": "View on Amazon",
+  "footer": "© 2025 Amazon Product Scraper - Built with Bun & Vite",
+  "language": "Language"
+}

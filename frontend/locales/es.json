@@ -1,0 +1,23 @@
+{
+  "title": "Buscador de Productos Amazon",
+  "subtitle": "Busca productos en Amazon y ve los resultados de la primera página",
+  "searchPlaceholder": "Ingresa la palabra clave del producto (ej: laptop, auriculares, libros...)",
+  "searchButton": "Buscar Productos",
+  "searchInfo": "Presiona Enter o haz clic en Buscar para encontrar productos",
+  "loadingMessage": "Buscando productos en Amazon...",
+  "errorMessage": "Error al buscar productos. Inténtalo de nuevo.",
+  "noProductsError": "No se encontraron productos para \"{{keyword}}\". Prueba con un término diferente.",
+  "keywordRequired": "Por favor, ingresa una palabra clave de búsqueda",
+  "keywordTooShort": "La palabra clave debe tener al menos 2 caracteres",
+  "resultsTitle": "Resultados de Búsqueda",
+  "resultsCount": "{{count}} productos encontrados",
+  "resultsKeyword": "para \"{{keyword}}\"",
+  "noRating": "Sin calificación",
+  "noReviews": "Sin reseñas",
+  "oneReview": "1 reseña",
+  "multipleReviews": "{{count}} reseñas",
+  "noPrice": "Precio no disponible",
+  "viewProduct": "Ver en Amazon",
+  "footer": "© 2025 Buscador de Productos Amazon - Construido con Bun & Vite",
+  "language": "Idioma"
+}
