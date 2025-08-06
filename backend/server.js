@@ -64,13 +64,27 @@ async function scrapeAmazonProducts(keyword) {
           return;
         }
         
-        // Extract product title
-        const titleElement = element.querySelector('h2 a span') || 
+        // Extract product title and URL
+        const titleLinkElement = element.querySelector('h2 a') || 
+                                element.querySelector('a[data-cy="title-recipe-title"]') ||
+                                element.querySelector('.s-link-style a');
+        
+        const titleElement = titleLinkElement?.querySelector('span') || 
+                            element.querySelector('h2 a span') || 
                             element.querySelector('.s-size-mini span') ||
                             element.querySelector('[data-cy="title-recipe-title"]') ||
                             element.querySelector('h2 span');
         
         const title = titleElement ? titleElement.textContent.trim() : 'N/A';
+        
+        // Extract product URL
+        let productUrl = 'N/A';
+        if (titleLinkElement) {
+          const href = titleLinkElement.getAttribute('href');
+          if (href) {
+            productUrl = href.startsWith('http') ? href : `https://www.amazon.com${href}`;
+          }
+        }
         
         // Extract rating (stars)
         const ratingElement = element.querySelector('.a-icon-alt') ||
@@ -104,10 +118,44 @@ async function scrapeAmazonProducts(keyword) {
         const imageUrl = imageElement ? 
           (imageElement.getAttribute('src') || imageElement.getAttribute('data-src') || 'N/A') : 'N/A';
         
+        // Extract product price
+        let price = 'N/A';
+        const priceSelectors = [
+          '.a-price .a-offscreen',
+          '.a-price-whole',
+          '.a-price .a-offscreen',
+          '[data-a-price] .a-offscreen',
+          '.a-price-symbol + .a-price-whole',
+          '.a-text-price .a-offscreen',
+          '.a-color-price .a-offscreen'
+        ];
+        
+        for (const selector of priceSelectors) {
+          const priceElement = element.querySelector(selector);
+          if (priceElement && priceElement.textContent.trim()) {
+            price = priceElement.textContent.trim();
+            break;
+          }
+        }
+        
+        // Fallback price extraction
+        if (price === 'N/A') {
+          const priceElements = element.querySelectorAll('.a-price, .a-color-price, .a-text-price');
+          for (const priceEl of priceElements) {
+            const priceText = priceEl.textContent.trim();
+            if (priceText.match(/[\$£€¥₹]\d+/)) {
+              price = priceText;
+              break;
+            }
+          }
+        }
+        
         // Only add product if we have at least a title
         if (title && title !== 'N/A') {
           products.push({
             title: title.substring(0, 200), // Limit title length
+            productUrl,
+            price,
             rating,
             reviews,
             imageUrl
