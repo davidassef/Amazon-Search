@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Product Scraper</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🛒 Amazon Product Scraper</h1>
+            <p>Search for products on Amazon and view the first page results</p>
+        </header>
+
+        <main class="main">
+            <section class="search-section">
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Enter product keyword (e.g., laptop, headphones, books...)"
+                        class="search-input"
+                    >
+                    <button id="searchButton" class="search-button">
+                        <span class="button-text">Search Products</span>
+                        <span class="loading-spinner" style="display: none;">🔄</span>
+                    </button>
+                </div>
+                <div class="search-info">
+                    <small>Press Enter or click Search to find products</small>
+                </div>
+            </section>
+
+            <section class="results-section">
+                <div id="loadingMessage" class="message loading-message" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Scraping Amazon products...</p>
+                </div>
+
+                <div id="errorMessage" class="message error-message" style="display: none;">
+                    <p></p>
+                </div>
+
+                <div id="resultsContainer" class="results-container" style="display: none;">
+                    <div class="results-header">
+                        <h2>Search Results</h2>
+                        <div class="results-info">
+                            <span id="resultsCount"></span>
+                            <span id="searchKeyword"></span>
+                        </div>
+                    </div>
+                    <div id="productsList" class="products-list">
+                        <!-- Products will be inserted here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 Amazon Product Scraper - Built with Bun & Vite</p>
+        </footer>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
