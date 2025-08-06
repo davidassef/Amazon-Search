@@ -1,0 +1,25 @@
+{
+  "name": "amazon-scraper-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Amazon product scraper using Bun",
+  "main": "server.js",
+  "scripts": {
+    "start": "bun run server.js",
+    "dev": "bun --watch server.js"
+  },
+  "keywords": [
+    "amazon",
+    "scraper",
+    "bun",
+    "express",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.2",
+    "jsdom": "^23.0.1",
+    "cors": "^2.8.5"
+  }
+}
