@@ -1,0 +1,21 @@
+{
+  "hash": "97460434",
+  "configHash": "af169111",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "3476fb60",
+  "optimized": {
+    "i18next": {
+      "src": "../../frontend/node_modules/i18next/dist/esm/i18next.js",
+      "file": "i18next.js",
+      "fileHash": "beda850a",
+      "needsInterop": false
+    },
+    "i18next-browser-languagedetector": {
+      "src": "../../frontend/node_modules/i18next-browser-languagedetector/dist/esm/i18nextBrowserLanguageDetector.js",
+      "file": "i18next-browser-languagedetector.js",
+      "fileHash": "afdd2d87",
+      "needsInterop": false
+    }
+  },
+  "chunks": {}
+}

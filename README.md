@@ -45,10 +45,10 @@ cd backend
 bun install
 ```
 
-### 3. Frontend Setup (Vite)
+### 3. Frontend Setup (Vite + Tailwind CSS)
 ```bash
 cd ../frontend
-npm install
+bun install
 ```
 
 ## Running the Application

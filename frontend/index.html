@@ -4,77 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amazon Product Scraper</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="src/input.css">
 </head>
-<body>
-    <div class="container">
-        <header class="header">
-            <div class="header-content">
-                <div class="title-section">
-                    <h1 data-i18n="title">🛒 Amazon Product Scraper</h1>
-                    <p data-i18n="subtitle">Search for products on Amazon and view the first page results</p>
-                </div>
-                <div class="language-selector">
-                    <label for="languageSelect" data-i18n="language">Language:</label>
-                    <select id="languageSelect" class="language-select">
-                        <option value="en">🇺🇸 English</option>
-                        <option value="pt">🇧🇷 Português</option>
-                        <option value="es">🇪🇸 Español</option>
-                    </select>
+<body class="main-gradient min-h-screen">
+    <div class="container mx-auto px-4">
+        <header class="header-gradient shadow-xl">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <div class="title-section text-center md:text-left">
+                        <h1 class="text-3xl md:text-4xl font-bold text-white mb-2" data-i18n="title">🛒 Amazon Product Scraper</h1>
+                        <p class="text-gray-200 text-lg" data-i18n="subtitle">Search for products on Amazon and view the first page results</p>
+                    </div>
+                    <div class="language-section flex items-center space-x-3">
+                        <label for="languageSelect" class="text-white font-medium" data-i18n="language">Language:</label>
+                        <select id="languageSelect" class="language-selector">
+                            <option value="en">🇺🇸 English</option>
+                            <option value="pt">🇧🇷 Português</option>
+                            <option value="es">🇪🇸 Español</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <main class="main">
-            <section class="search-section">
-                <div class="search-container">
-                    <input 
-                        type="text" 
-                        id="searchInput" 
-                        data-i18n-placeholder="searchPlaceholder"
-                        placeholder="Enter product keyword (e.g., laptop, headphones, books...)"
-                        class="search-input"
-                    >
-                    <button id="searchButton" class="search-button">
-                        <span class="button-text" data-i18n="searchButton">Search Products</span>
-                        <span class="loading-spinner" style="display: none;">🔄</span>
-                    </button>
-                </div>
-                <div class="search-info">
-                    <small data-i18n="searchInfo">Press Enter or click Search to find products</small>
+        <main class="main py-12">
+            <section class="search-section mb-12">
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-white rounded-2xl shadow-2xl p-8">
+                        <div class="search-container space-y-4">
+                            <input 
+                                type="text" 
+                                id="searchInput" 
+                                data-i18n-placeholder="searchPlaceholder"
+                                placeholder="Enter product keyword (e.g., laptop, headphones, books...)"
+                                class="search-input"
+                            >
+                            <button id="searchButton" class="btn-primary w-full flex items-center justify-center space-x-2">
+                                <span class="button-text" data-i18n="searchButton">Search Products</span>
+                                <span class="loading-spinner hidden">
+                                    <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </span>
+                            </button>
+                        </div>
+                        <div class="search-info mt-4 text-center">
+                            <small class="text-gray-600" data-i18n="searchInfo">Press Enter or click Search to find products</small>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <section class="results-section">
-                <div id="loadingMessage" class="message loading-message" style="display: none;">
-                    <div class="spinner"></div>
-                    <p data-i18n="loadingMessage">Scraping Amazon products...</p>
+                <div id="loadingMessage" class="hidden text-center py-12">
+                    <div class="inline-flex items-center px-8 py-4 bg-white rounded-xl shadow-lg">
+                        <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-amazon-orange" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-xl font-semibold text-gray-700" data-i18n="loadingMessage">Scraping Amazon products...</span>
+                    </div>
                 </div>
 
-                <div id="errorMessage" class="message error-message" style="display: none;">
-                    <p></p>
-                </div>
-
-                <div id="resultsContainer" class="results-container" style="display: none;">
-                    <div class="results-header">
-                        <h2 data-i18n="resultsTitle">Search Results</h2>
-                        <div class="results-info">
-                            <span id="resultsCount"></span>
-                            <span id="searchKeyword"></span>
+                <div id="errorMessage" class="hidden">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="bg-red-50 border-l-4 border-red-400 rounded-lg p-6 shadow-lg">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-red-700 font-medium" id="errorText"></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div id="productsList" class="products-list">
-                        <!-- Products will be inserted here -->
+                </div>
+
+                <div id="resultsContainer" class="hidden">
+                    <div class="max-w-7xl mx-auto">
+                        <div class="results-header text-center mb-8">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-4" data-i18n="resultsTitle">Search Results</h2>
+                            <div class="bg-white rounded-lg shadow-lg p-4 inline-block">
+                                <span id="resultsCount" class="text-lg font-semibold text-amazon-orange"></span>
+                                <span class="text-gray-600 mx-2">for</span>
+                                <span id="searchKeyword" class="text-lg font-semibold text-gray-800"></span>
+                            </div>
+                        </div>
+                        <div id="productsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <!-- Products will be inserted here -->
+                        </div>
                     </div>
                 </div>
             </section>
         </main>
 
-        <footer class="footer">
-            <p data-i18n="footer">&copy; 2025 Amazon Product Scraper - Built with Bun & Vite</p>
+        <footer class="bg-amazon-darkblue text-white py-6 mt-12">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <p class="text-gray-300" data-i18n="footer">&copy; 2025 Amazon Product Scraper - Built with Bun & Vite</p>
+            </div>
         </footer>
     </div>
 
+    <script type="module" src="i18n.js"></script>
     <script type="module" src="main.js"></script>
 </body>
 </html>

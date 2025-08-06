@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Components */
+@layer components {
+  .product-card {
+    @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer border border-gray-200 overflow-hidden;
+  }
+  
+  .product-card:hover {
+    @apply border-amazon-lightblue;
+  }
+  
+  .btn-primary {
+    @apply bg-amazon-orange hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg transform hover:scale-105;
+  }
+  
+  .language-selector {
+    @apply bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm font-medium shadow-sm hover:shadow-md transition-all duration-200;
+  }
+  
+  .search-input {
+    @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amazon-lightblue focus:ring-2 focus:ring-amazon-lightblue focus:ring-opacity-20 outline-none transition-all duration-200;
+  }
+  
+  .header-gradient {
+    @apply bg-gradient-to-r from-amazon-darkblue via-gray-800 to-amazon-darkblue;
+  }
+  
+  .main-gradient {
+    @apply bg-gradient-to-br from-gray-50 via-blue-50 to-orange-50;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    line-height: 1.4;
+    max-height: 2.8em;
+  }
+}
