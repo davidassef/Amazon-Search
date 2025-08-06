@@ -1,0 +1,22 @@
+{
+  "name": "amazon-scraper-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Amazon product scraper using Vite",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "amazon",
+    "scraper",
+    "vite",
+    "frontend"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.8"
+  }
+}
