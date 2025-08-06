@@ -67,14 +67,14 @@ bun install
 ### Start Backend Server
 ```bash
 cd backend
-bun run server.js
+bun run dev
 ```
 The API will be available at `http://localhost:3000`
 
 ### Start Frontend Development Server
 ```bash
 cd frontend
-npm run dev
+bunx vite
 ```
 The frontend will be available at `http://localhost:5173`
 
