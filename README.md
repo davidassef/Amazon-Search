@@ -5,12 +5,23 @@ A full-stack application to scrape Amazon product listings from search results. 
 ## Features
 
 - **Backend API** (Bun + Express): Scrapes Amazon search results and returns product data as JSON
-- **Frontend Interface** (HTML + CSS + Vanilla JS + Vite): Clean, user-friendly interface to search and display products
+- **Frontend Interface** (HTML + Tailwind CSS + Vanilla JS + Vite): Modern, responsive interface to search and display products
+- **Internationalization** (i18next): Multi-language support (English, Portuguese, Spanish)
 - **Product Data Extraction**:
   - Product Title
+  - Product Price
   - Rating (stars out of five)
   - Number of reviews
   - Product image URL
+  - Direct Amazon product links
+- **Enhanced UX**:
+  - Clickable product cards that redirect to Amazon
+  - Modern responsive design with Tailwind CSS
+  - Beautiful animations and hover effects
+  - Language selector in header
+  - Loading states and error handling
+  - Mobile-optimized interface
+  - Amazon-inspired color scheme
 
 ## Project Structure
 
