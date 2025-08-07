@@ -146,3 +146,9 @@ temp/
 # OS generated files
 .DS_Store*
 Icon?
+
+# Vite cache and build files
+.vite/
+
+# GitHub specific files  
+.github/
