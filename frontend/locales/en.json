@@ -17,7 +17,9 @@
   "oneReview": "1 review",
   "multipleReviews": "{{count}} reviews",
   "noPrice": "Price not available",
+  "priceNotAvailable": "Price not available",
   "viewProduct": "View on Amazon",
+  "searchOnAmazon": "Search on Amazon",
   "footer": "© 2025 Amazon Product Scraper - Built with Bun & Vite",
   "language": "Language"
 }

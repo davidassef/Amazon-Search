@@ -64,26 +64,78 @@ async function scrapeAmazonProducts(keyword) {
           return;
         }
         
-        // Extract product title and URL
-        const titleLinkElement = element.querySelector('h2 a') || 
-                                element.querySelector('a[data-cy="title-recipe-title"]') ||
-                                element.querySelector('.s-link-style a');
+        // Extract product title and URL with improved selectors
+        const titleLinkSelectors = [
+          'h2 a[href]',
+          'a[data-cy="title-recipe-title"]',
+          '.s-link-style a[href]',
+          'a[href*="/dp/"]',
+          'a[href*="/gp/product/"]',
+          '[data-asin] a[href]',
+          '.s-size-mini a[href]',
+          '.a-link-normal[href]'
+        ];
         
-        const titleElement = titleLinkElement?.querySelector('span') || 
-                            element.querySelector('h2 a span') || 
-                            element.querySelector('.s-size-mini span') ||
-                            element.querySelector('[data-cy="title-recipe-title"]') ||
-                            element.querySelector('h2 span');
+        let titleLinkElement = null;
+        for (const selector of titleLinkSelectors) {
+          titleLinkElement = element.querySelector(selector);
+          if (titleLinkElement) {
+            console.log(`Found link with selector: ${selector}`);
+            break;
+          }
+        }
+        
+        const titleSelectors = [
+          'h2 a span',
+          'h2 span',
+          '.s-size-mini span',
+          '[data-cy="title-recipe-title"]',
+          '.a-link-normal span',
+          '.s-color-base'
+        ];
+        
+        let titleElement = null;
+        if (titleLinkElement) {
+          titleElement = titleLinkElement.querySelector('span');
+        }
+        
+        if (!titleElement) {
+          for (const selector of titleSelectors) {
+            titleElement = element.querySelector(selector);
+            if (titleElement) {
+              console.log(`Found title with selector: ${selector}`);
+              break;
+            }
+          }
+        }
         
         const title = titleElement ? titleElement.textContent.trim() : 'N/A';
         
-        // Extract product URL
+        // Extract product URL with better logic
         let productUrl = 'N/A';
         if (titleLinkElement) {
           const href = titleLinkElement.getAttribute('href');
           if (href) {
-            productUrl = href.startsWith('http') ? href : `https://www.amazon.com${href}`;
+            if (href.startsWith('http')) {
+              productUrl = href;
+            } else if (href.startsWith('/')) {
+              productUrl = `https://www.amazon.com${href}`;
+            } else {
+              productUrl = `https://www.amazon.com/${href}`;
+            }
+            console.log(`Extracted URL: ${productUrl}`);
+          } else {
+            console.log('Link element found but no href attribute');
           }
+        } else {
+          console.log(`No link found for product ${index + 1}: ${title.substring(0, 50)}...`);
+        }
+        
+        // Fallback: Generate search URL if no specific URL found
+        if (productUrl === 'N/A' && title !== 'N/A') {
+          const searchTerm = title.substring(0, 100); // Limit length for URL
+          productUrl = `https://www.amazon.com/s?k=${encodeURIComponent(searchTerm)}`;
+          console.log(`Generated fallback search URL for: ${title.substring(0, 30)}...`);
         }
         
         // Extract rating (stars)
@@ -252,3 +304,5 @@ app.listen(PORT, () => {
   console.log(`🚀 Amazon Scraper API running on http://localhost:${PORT}`);
   console.log(`📡 Scrape endpoint: http://localhost:${PORT}/api/scrape?keyword=<search-term>`);
 });
+
+module.exports = { app, scrapeAmazonProducts };

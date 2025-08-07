@@ -17,7 +17,9 @@
   "oneReview": "1 reseña",
   "multipleReviews": "{{count}} reseñas",
   "noPrice": "Precio no disponible",
+  "priceNotAvailable": "Precio no disponible",
   "viewProduct": "Ver en Amazon",
+  "searchOnAmazon": "Buscar en Amazon",
   "footer": "© 2025 Buscador de Productos Amazon - Construido con Bun & Vite",
   "language": "Idioma"
 }

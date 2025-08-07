@@ -4,8 +4,11 @@
   "description": "Backend API for Amazon product scraper using Bun",
   "main": "server.js",
   "scripts": {
-    "start": "bun run server.js",
-    "dev": "bun --watch server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "dev:bun": "bun --watch server.js", 
+    "test": "bun test",
+    "start:bun": "bun server.js"
   },
   "keywords": [
     "amazon",
@@ -21,5 +24,8 @@
     "axios": "^1.6.2",
     "jsdom": "^23.0.1",
     "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.4"
   }
 }

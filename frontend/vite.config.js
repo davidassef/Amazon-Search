@@ -4,8 +4,8 @@ export default defineConfig({
   root: './',
   server: {
     port: 5173,
-    host: true,
-    open: true
+    host: '0.0.0.0',
+    open: false
   },
   build: {
     outDir: 'dist',
