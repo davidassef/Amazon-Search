@@ -2,52 +2,70 @@
 
 A full-stack application to scrape Amazon product listings from search results. Built with Bun (backend) and Vite (frontend).
 
-## Features
+## ✨ Features
 
-- **Backend API** (Bun + Express): Scrapes Amazon search results and returns product data as JSON
-- **Frontend Interface** (HTML + Tailwind CSS + Vanilla JS + Vite): Modern, responsive interface to search and display products
-- **Internationalization** (i18next): Multi-language support (English, Portuguese, Spanish)
-- **Product Data Extraction**:
+- **🔧 Backend API** (Bun + Express): Scrapes Amazon search results and returns product data as JSON
+- **💻 Frontend Interface** (HTML + Tailwind CSS + Vanilla JS + Vite): Modern, responsive interface to search and display products
+- **🌐 Internationalization** (i18next): Multi-language support (English, Portuguese, Spanish)
+- **📊 Product Data Extraction**:
   - Product Title
   - Product Price
   - Rating (stars out of five)
   - Number of reviews
   - Product image URL
-  - Direct Amazon product links
-- **Enhanced UX**:
+  - Direct Amazon product links with fallback search URLs
+- **🎨 Enhanced UX**:
   - Clickable product cards that redirect to Amazon
   - Modern responsive design with Tailwind CSS
   - Beautiful animations and hover effects
-  - Language selector in header
+  - Language selector with persistence
   - Loading states and error handling
   - Mobile-optimized interface
   - Amazon-inspired color scheme
+  - Visual indicators for direct vs search links
 
-## Project Structure
+## 📁 Project Structure
 
 ```
-├── backend/           # Bun backend API
-│   ├── server.js      # Express server with scraping endpoint
-│   └── package.json   # Backend dependencies
-├── frontend/          # Vite frontend
-│   ├── index.html     # Main HTML file
-│   ├── style.css      # Styling
-│   ├── main.js        # Frontend logic
-│   └── package.json   # Frontend dependencies
-└── README.md          # This file
+├── backend/                    # Bun backend API
+│   ├── server.js              # Express server with scraping endpoint
+│   ├── package.json           # Backend dependencies
+│   ├── jest.config.js         # Jest testing configuration
+│   ├── server.test.js         # Server unit tests
+│   └── tests/                 # Additional test files
+│       └── api.test.js        # API endpoint tests
+├── frontend/                   # Vite frontend
+│   ├── index.html             # Main HTML file
+│   ├── main.js                # Frontend logic with i18n
+│   ├── i18n.js                # Internationalization setup
+│   ├── package.json           # Frontend dependencies
+│   ├── vite.config.js         # Vite configuration
+│   ├── vitest.config.js       # Vitest testing configuration
+│   ├── locales/               # Translation files
+│   │   ├── en.json            # English translations
+│   │   ├── pt.json            # Portuguese translations
+│   │   └── es.json            # Spanish translations
+│   └── src/                   # Source files
+│       ├── style.css          # Tailwind CSS styling
+│       └── test/              # Frontend test files
+│           ├── main.test.js   # Main functions tests
+│           └── setup.js       # Test setup configuration
+├── CLAUDE.md                  # Claude Code development guide
+├── TESTS_DOC.md              # Testing documentation and status
+└── README.md                 # This file
 ```
 
-## Prerequisites
+## 📋 Prerequisites
 
 - [Bun](https://bun.sh/) - JavaScript runtime and package manager
-- [Node.js](https://nodejs.org/) - For Vite frontend
+- [Node.js](https://nodejs.org/) - For Vite frontend (optional, Bun can handle most tasks)
 
-## Installation & Setup
+## 🚀 Installation & Setup
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/davidassef/test-longlifenutri
-cd test-longlifenutri
+git clone https://github.com/davidassef/Amazon-Search
+cd Amazon-Search
 ```
 
 ### 2. Backend Setup (Bun)
@@ -62,23 +80,34 @@ cd ../frontend
 bun install
 ```
 
-## Running the Application
+## ▶️ Running the Application
 
 ### Start Backend Server
 ```bash
 cd backend
-bun run dev
+bun run dev      # Development with auto-reload
+# OR
+bun start        # Production mode
 ```
 The API will be available at `http://localhost:3000`
 
 ### Start Frontend Development Server
 ```bash
 cd frontend
-bunx vite
+bun run dev      # Start Vite development server
 ```
 The frontend will be available at `http://localhost:5173`
 
-## API Usage
+### Alternative: Run both servers simultaneously
+```bash
+# Terminal 1 - Backend
+cd backend && bun run dev
+
+# Terminal 2 - Frontend  
+cd frontend && bun run dev
+```
+
+## 🔗 API Usage
 
 ### Scrape Products Endpoint
 ```
@@ -98,41 +127,101 @@ curl "http://localhost:3000/api/scrape?keyword=laptop"
   "products": [
     {
       "title": "Dell Inspiron 15 3000 Laptop",
+      "price": "$599.99",
       "rating": "4.2",
       "reviews": "1,234",
-      "imageUrl": "https://m.media-amazon.com/images/..."
+      "imageUrl": "https://m.media-amazon.com/images/...",
+      "productUrl": "https://amazon.com/dp/B08XYZ123"
     }
   ]
 }
 ```
 
-## Usage Instructions
+### Health Check Endpoint
+```
+GET /api/health
+```
 
-1. Start both backend and frontend servers
-2. Open the frontend URL in your browser
-3. Enter a search keyword in the input field
-4. Click "Search Products" button
-5. View the scraped product results displayed on the page
+**Response:**
+```json
+{
+  "status": "OK",
+  "timestamp": "2025-01-07T10:30:00Z"
+}
+```
 
-## Error Handling
+## 📖 Usage Instructions
 
-- Backend gracefully handles network errors and parsing failures
-- Frontend displays user-friendly error messages
-- Rate limiting and request validation implemented
+1. Start both backend and frontend servers (see [Running the Application](#-running-the-application))
+2. Open `http://localhost:5173` in your browser
+3. Select your preferred language (English/Portuguese/Spanish)
+4. Enter a search keyword in the input field (e.g., "laptop", "headphones", "books")
+5. Click "Search Products" button or press Enter
+6. View the scraped product results with images, prices, and ratings
+7. Click on any product card or "View on Amazon" button to redirect to Amazon
 
-## Technologies Used
+## 🔧 Testing
 
-- **Backend**: Bun, Express.js, Axios, JSDOM
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript, Vite
-- **API**: RESTful JSON API
+### Frontend Tests (Vitest)
+```bash
+cd frontend
+bun test                # Run tests
+bun run coverage        # Generate coverage report
+bun test --watch        # Watch mode
+```
 
-## Development Notes
+### Backend Tests (Jest - requires fixes)
+```bash
+cd backend
+bun test                # Currently needs Jest/Bun compatibility fixes
+```
 
-- The scraper targets Amazon's search results page structure
-- Includes proper error handling and user feedback
-- Responsive design for mobile and desktop
-- Clean, commented code for maintainability
+See [TESTS_DOC.md](TESTS_DOC.md) for detailed testing information and current status.
 
-## License
+## 🛡️ Error Handling
+
+- **Backend**: Gracefully handles network errors, parsing failures, and invalid requests
+- **Frontend**: Displays user-friendly error messages with internationalization
+- **Robust URL extraction**: Multiple CSS selectors with fallback search URLs
+- **Rate limiting**: Request validation and error recovery implemented
+- **CORS**: Properly configured for cross-origin requests
+
+## 🔧 Technologies Used
+
+- **Backend**: Bun, Express.js, Axios, JSDOM, CORS
+- **Frontend**: HTML5, Tailwind CSS, Vanilla JavaScript, Vite, i18next
+- **Testing**: Jest (backend), Vitest (frontend), JSDOM
+- **Development**: Hot reload, watch mode, development servers
+- **API**: RESTful JSON API with comprehensive error handling
+
+## 🌟 Recent Improvements
+
+- ✅ **i18n System**: Complete internationalization with language persistence
+- ✅ **FOUC Fix**: Optimized CSS loading to prevent flash of unstyled content
+- ✅ **URL Extraction**: Enhanced backend with multiple CSS selectors and fallbacks
+- ✅ **Visual Indicators**: Distinguished direct links vs search links
+- ✅ **Testing Setup**: Added comprehensive testing infrastructure
+- ✅ **Documentation**: Complete project documentation and guides
+
+## 🏗️ Development Notes
+
+- The scraper targets Amazon's search results page structure with robust fallbacks
+- Includes comprehensive error handling and user feedback
+- Responsive design optimized for mobile and desktop
+- Clean, well-documented code with proper separation of concerns
+- Modular architecture supporting easy testing and maintenance
+- Amazon-inspired design with modern UI/UX patterns
+
+## 📄 License
 
 MIT License - see LICENSE file for details
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests to ensure everything works
+5. Submit a pull request
+
+For development guidelines, see [CLAUDE.md](CLAUDE.md)
