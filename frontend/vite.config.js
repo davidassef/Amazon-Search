@@ -1,18 +1,23 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  root: './',
+  root: '.',
+  publicDir: 'public',
   server: {
     port: 5173,
-    host: '0.0.0.0',
-    open: false
+    open: false,
+    host: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
   },
   build: {
     outDir: 'dist',
-    assetsDir: 'assets',
     sourcemap: true
-  },
-  css: {
-    postcss: './postcss.config.js'
   }
 })
+
