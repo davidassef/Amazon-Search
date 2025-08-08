@@ -43,11 +43,11 @@ A full-stack application to scrape Amazon product listings from search results. 
 
 ### Desktop Version
 
-<video src="assets/videos/PreviewDesktop.mp4" autoplay loop muted playsinline></video>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/hZWD44ORgY8?si=FHtEANV9DRU3ypi0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ### Mobile Version
 
-<video src="assets/videos/PreviewMobile.mp4" autoplay loop muted playsinline></video>
+<iframe width="350" height="622" src="https://www.youtube.com/embed/TumyyzScH_w" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 
 > 💡 **Quick Demo**: The videos above show the full application in action, including real-time search, responsive design, and multi-language support.
