@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Amazon Product Lookup</title>
+    <meta name="description" content="Search and browse Amazon products by region with an accessible, mobile-first UI." />
+
+    <!-- Compiled CSS -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header role="banner" class="site-header">
+      <div class="branding" aria-label="App branding">
+        <img src="/favicon.ico" alt="App logo" class="logo" />
+        <h1 class="app-title">Amazon Product Lookup</h1>
+      </div>
+
+      <nav class="top-nav" aria-label="Global">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <label for="lang-select" class="visually-hidden">Language</label>
+            <select id="lang-select" name="language" aria-label="Select language">
+              <option value="en" selected>English</option>
+              <option value="es">Español</option>
+              <option value="de">Deutsch</option>
+              <option value="fr">Français</option>
+              <option value="it">Italiano</option>
+              <option value="ja">日本語</option>
+              <option value="hi">हिन्दी</option>
+              <option value="pt">Português</option>
+            </select>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main-content" role="main">
+      <section class="search" aria-labelledby="search-heading">
+        <h2 id="search-heading">Search products</h2>
+        <form id="search-form" role="search" aria-describedby="search-help">
+          <fieldset>
+            <legend class="visually-hidden">Search criteria</legend>
+            <div class="form-row">
+              <label for="query">Search term</label>
+              <input id="query" name="query" type="search" inputmode="search" autocomplete="on" placeholder="e.g. wireless headphones" required aria-required="true" />
+            </div>
+            <div class="form-row">
+              <label for="region">Amazon region</label>
+              <select id="region" name="region" required aria-required="true">
+                <option value="US" selected>United States (.com)</option>
+                <option value="CA">Canada (.ca)</option>
+                <option value="MX">Mexico (.com.mx)</option>
+                <option value="BR">Brazil (.com.br)</option>
+                <option value="UK">United Kingdom (.co.uk)</option>
+                <option value="DE">Germany (.de)</option>
+                <option value="FR">France (.fr)</option>
+                <option value="IT">Italy (.it)</option>
+                <option value="ES">Spain (.es)</option>
+                <option value="JP">Japan (.co.jp)</option>
+                <option value="IN">India (.in)</option>
+                <option value="AU">Australia (.com.au)</option>
+              </select>
+            </div>
+            <p id="search-help" class="help-text">Enter a product search term and choose an Amazon region.</p>
+            <div class="form-actions">
+              <button type="submit" id="search-submit">Search</button>
+            </div>
+          </fieldset>
+        </form>
+      </section>
+
+      <section id="feedback" aria-label="System messages">
+        <p id="error-message" role="alert" aria-live="assertive" hidden></p>
+      </section>
+
+      <section id="results-section" aria-labelledby="results-heading">
+        <div class="results-header">
+          <h2 id="results-heading">Results</h2>
+          <p id="results-summary" class="results-summary" aria-live="polite"></p>
+        </div>
+
+        <div id="loading" class="loading" role="status" aria-live="polite" aria-busy="false" hidden>
+          <span class="spinner" aria-hidden="true"></span>
+          <span class="loading-text">Loading results…</span>
+        </div>
+
+        <div id="results" class="results-grid" role="list" aria-label="Product results"></div>
+
+        <template id="product-card-template">
+          <article class="product" role="listitem" aria-label="Product">
+            <a class="product-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="View product">
+              <img class="product-image" alt="" />
+              <div class="product-body">
+                <h3 class="product-title"></h3>
+                <p class="product-price" aria-label="Price"></p>
+                <p class="product-rating" aria-label="Rating"></p>
+              </div>
+            </a>
+          </article>
+        </template>
+
+        <div id="no-results" class="no-results" role="note" hidden>
+          No products found. Try a different search term.
+        </div>
+      </section>
+    </main>
+
+    <footer role="contentinfo" class="site-footer">
+      <small>
+        © <span id="year"></span> Amazon Product Lookup. For demonstration purposes only. Not affiliated with Amazon.
+      </small>
+    </footer>
+
+    <noscript>
+      <div class="no-js" role="alert">This app requires JavaScript to function properly. Please enable JavaScript in your browser.</div>
+    </noscript>
+
+    <!-- Main JS Module -->
+    <script type="module" src="main.js" defer></script>
+    <script>
+      // Minimal JS to set the current year if JS is enabled
+      document.addEventListener('DOMContentLoaded', () => {
+        const el = document.getElementById('year');
+        if (el) el.textContent = new Date().getFullYear();
+      });
+    </script>
+  </body>
+</html>
+
