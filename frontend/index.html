@@ -3,114 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Amazon Product Scraper - Search for products on Amazon and view results">
     <title>Amazon Product Scraper</title>
-    <link rel="stylesheet" href="/src/style.css">
-    <link rel="preload" href="/src/style.css" as="style">
+    <link rel="stylesheet" href="src/styles.css">
 </head>
-<body class="main-gradient min-h-screen">
-    <div class="container mx-auto px-4">
-        <header class="header-gradient shadow-xl">
-            <div class="max-w-7xl mx-auto px-4 py-6">
-                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                    <div class="title-section text-center md:text-left">
-                        <h1 class="text-3xl md:text-4xl font-bold text-white mb-2" data-i18n="title">🛒 Amazon Product Scraper</h1>
-                        <p class="text-gray-200 text-lg" data-i18n="subtitle">Search for products on Amazon and view the first page results</p>
+<body class="bg-gradient-to-br from-[#f3f4f6] to-[#eef2f7] min-h-screen">
+    <!-- Header -->
+    <header class="bg-amazon-dark text-white shadow-sm border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-2xl font-bold" data-i18n="title">Amazon Product Scraper</h1>
+                
+                <!-- Language selector on header right -->
+                <div class="flex items-center gap-2">
+                    <label for="language-select" class="sr-only" data-i18n="language">Language</label>
+                    <select id="language-select" class="form-select bg-white text-gray-900 min-w-[130px]">
+                        <option value="en">🇺🇸 English</option>
+                        <option value="pt">🇧🇷 Português</option>
+                        <option value="es">🇪🇸 Español</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Search Section -->
+        <section class="search-section bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2" data-i18n="searchTitle">Find products on Amazon</h2>
+                <p class="text-gray-600" data-i18n="searchSubtitle">Enter a product name and select your preferred Amazon country</p>
+            </div>
+            
+            <form id="search-form" class="max-w-3xl mx-auto">
+                <div class="search-container grid gap-3 md:grid-cols-[1fr_auto_auto] items-start">
+                    <!-- Search input -->
+                    <div class="relative">
+                        <label for="search-input" class="sr-only" data-i18n="searchFor">Search for products</label>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            class="search-input w-full px-4 py-3 text-base md:text-lg border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-amazon-orange focus:border-amazon-orange outline-none transition-all duration-200" 
+                            data-i18n-placeholder="searchPlaceholder"
+                            placeholder="Enter product keyword (e.g., laptop, headphones, books...)"
+                            required
+                            autocomplete="off"
+                        >
+                        <div id="suggestions" class="suggestions-dropdown hidden absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto"></div>
                     </div>
-                    <div class="language-section flex items-center space-x-3">
-                        <label for="languageSelect" class="text-white font-medium" data-i18n="language">Language:</label>
-                        <select id="languageSelect" class="language-selector">
-                            <option value="en">🇺🇸 English</option>
-                            <option value="pt">🇧🇷 Português</option>
-                            <option value="es">🇪🇸 Español</option>
+
+                    <!-- Submit button -->
+                    <button 
+                        type="submit" 
+                        id="search-button" 
+                        class="search-button w-full md:w-auto bg-amazon-orange hover:bg-[#e08500] text-white font-semibold py-3 px-6 md:py-4 md:px-8 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-i18n="searchButton"
+                    >
+                        Search Products
+                    </button>
+
+                    <!-- Country/Region selector with flag (to the right of search button) -->
+                    <div class="flex items-center gap-2">
+                        <label for="country-select" class="sr-only" data-i18n="country">Country/Region</label>
+                        <select id="country-select" class="form-select min-w-[160px]">
+                            <option value="us">🇺🇸 United States</option>
+                            <option value="ca">🇨🇦 Canada</option>
+                            <option value="uk">🇬🇧 United Kingdom</option>
+                            <option value="de">🇩🇪 Germany</option>
+                            <option value="fr">🇫🇷 France</option>
+                            <option value="es">🇪🇸 Spain</option>
+                            <option value="it">🇮🇹 Italy</option>
+                            <option value="jp">🇯🇵 Japan</option>
+                            <option value="au">🇦🇺 Australia</option>
+                            <option value="in">🇮🇳 India</option>
+                            <option value="br">🇧🇷 Brazil</option>
+                            <option value="mx">🇲🇽 Mexico</option>
                         </select>
                     </div>
                 </div>
+                
+                <div class="flex items-center justify-center mt-4 text-sm text-gray-500">
+                    <span data-i18n="searchInfo">Press Enter to search quickly</span>
+                </div>
+            </form>
+        </section>
+
+        <!-- Loading Section -->
+        <section id="loading-section" class="loading-section hidden text-center py-12">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <div class="loading-messages">
+                <p id="loading-message" class="text-lg font-medium text-gray-700" data-i18n="loadingMessage">Scraping Amazon products...</p>
+                <p id="loading-status" class="text-sm text-gray-500 mt-2"></p>
             </div>
-        </header>
+        </section>
 
-        <main class="main py-12">
-            <section class="search-section mb-12">
-                <div class="max-w-2xl mx-auto">
-                    <div class="bg-white rounded-2xl shadow-2xl p-8">
-                        <div class="search-container space-y-4">
-                            <input 
-                                type="text" 
-                                id="searchInput" 
-                                data-i18n-placeholder="searchPlaceholder"
-                                placeholder="Enter product keyword (e.g., laptop, headphones, books...)"
-                                class="search-input"
-                            >
-                            <button id="searchButton" class="btn-primary w-full flex items-center justify-center space-x-2">
-                                <span class="button-text" data-i18n="searchButton">Search Products</span>
-                                <span class="loading-spinner hidden">
-                                    <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                </span>
-                            </button>
-                        </div>
-                        <div class="search-info mt-4 text-center">
-                            <small class="text-gray-600" data-i18n="searchInfo">Press Enter or click Search to find products</small>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="results-section">
-                <div id="loadingMessage" class="hidden text-center py-12">
-                    <div class="inline-flex items-center px-8 py-4 bg-white rounded-xl shadow-lg">
-                        <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-amazon-orange" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span class="text-xl font-semibold text-gray-700" data-i18n="loadingMessage">Scraping Amazon products...</span>
-                    </div>
-                </div>
-
-                <div id="errorMessage" class="hidden">
-                    <div class="max-w-2xl mx-auto">
-                        <div class="bg-red-50 border-l-4 border-red-400 rounded-lg p-6 shadow-lg">
-                            <div class="flex">
-                                <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                                    </svg>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-red-700 font-medium" id="errorText"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="resultsContainer" class="hidden">
-                    <div class="max-w-7xl mx-auto">
-                        <div class="results-header text-center mb-8">
-                            <h2 class="text-3xl font-bold text-gray-800 mb-4" data-i18n="resultsTitle">Search Results</h2>
-                            <div class="bg-white rounded-lg shadow-lg p-4 inline-block">
-                                <span id="resultsCount" class="text-lg font-semibold text-amazon-orange"></span>
-                                <span class="text-gray-600 mx-2">for</span>
-                                <span id="searchKeyword" class="text-lg font-semibold text-gray-800"></span>
-                            </div>
-                        </div>
-                        <div id="productsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            <!-- Products will be inserted here -->
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="bg-amazon-darkblue text-white py-6 mt-12">
-            <div class="max-w-7xl mx-auto px-4 text-center">
-                <p class="text-gray-300" data-i18n="footer">&copy; 2025 Amazon Product Scraper - Built with Bun & Vite</p>
+        <!-- Results Section -->
+        <section id="results-section" class="results-section hidden">
+            <div class="results-header mb-6">
+                <h2 class="text-2xl font-bold text-gray-900" data-i18n="resultsTitle">Search Results</h2>
+                <p class="text-gray-600 mt-1">
+                    <span id="results-count"></span>
+                    <span id="results-keyword"></span>
+                </p>
             </div>
-        </footer>
-    </div>
+            
+            <div id="results-grid" class="results-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Product cards will be inserted here -->
+            </div>
+        </section>
 
-    <script type="module" src="i18n.js"></script>
+        <!-- Error Section -->
+        <section id="error-section" class="error-section hidden text-center py-12">
+            <div class="bg-red-50 border border-red-200 rounded-xl p-6 max-w-md mx-auto">
+                <div class="text-red-600 mb-2">
+                    <svg class="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <p id="error-message" class="text-red-700 font-medium"></p>
+                <button id="retry-button" class="mt-4 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                    Try Again
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p class="text-gray-600 mb-2" data-i18n="footerTech">Built with Bun, Vite & Tailwind CSS</p>
+                <p class="text-sm text-gray-500" data-i18n="footerFeatures">12 Countries • Real-time Data</p>
+                <p class="text-sm text-gray-500 mt-2" data-i18n="footerCopyright">© 2025 • Educational purposes only</p>
+            </div>
+        </div>
+    </footer>
+
     <script type="module" src="main.js"></script>
 </body>
 </html>
