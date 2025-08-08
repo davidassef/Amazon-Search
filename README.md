@@ -1,5 +1,34 @@
 # Amazon Product Scraper
 
+**Description:** A full-stack web application for scraping Amazon product listings from search results, featuring a modern responsive interface and comprehensive API.
+
+**Last Updated:** August 2025
+
+---
+
+## Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [Project Structure](#-project-structure)
+- [Prerequisites](#-prerequisites)
+- [Installation & Setup](#-installation--setup)
+- [Running the Application](#-running-the-application)
+- [API Usage](#-api-usage)
+- [Documentation](#-documentation)
+- [Usage Instructions](#-usage-instructions)
+- [Testing](#-testing)
+- [Error Handling](#-error-handling)
+- [Technologies Used](#-technologies-used)
+- [Recent Improvements](#-recent-improvements)
+- [Development Notes](#-development-notes)
+- [License](#-license)
+- [Contributing](#-contributing)
+
+---
+
+## 🎯 Overview
+
 A full-stack application to scrape Amazon product listings from search results. Built with Bun (backend) and Vite (frontend).
 
 ## ✨ Features
@@ -51,7 +80,10 @@ A full-stack application to scrape Amazon product listings from search results. 
 │           ├── main.test.js   # Main functions tests
 │           └── setup.js       # Test setup configuration
 ├── CLAUDE.md                  # Claude Code development guide
-├── TESTS_DOC.md              # Testing documentation and status
+├── docs/                      # Documentation
+│   ├── development/           # Development guides
+│   ├── getting-started/       # Getting started guides
+│   └── testing/               # Testing documentation
 └── README.md                 # This file
 ```
 
@@ -146,9 +178,24 @@ GET /api/health
 ```json
 {
   "status": "OK",
-  "timestamp": "2025-01-07T10:30:00Z"
+  "timestamp": "2025-08-07T10:30:00Z"
 }
 ```
+
+## 📚 Documentation
+
+For comprehensive guides and detailed information, visit our **[📖 Complete Documentation Index](docs/INDEX.md)**
+
+### Quick Links
+- **🚀 [Quick Start Guide](docs/getting-started/quick-start.md)** - Fast setup and first run
+- **🔗 [API Reference](docs/INDEX.md#-api-documentation)** - Detailed API documentation
+- **📱 [Mobile-First Design](docs/development/mobile-first-architecture.md)** - Responsive architecture
+- **🧪 [Testing Guide](docs/testing/testing-overview.md)** - Testing setup and troubleshooting
+- **⚡ [Performance Guide](frontend/PERFORMANCE_OPTIMIZATIONS.md)** - Optimization techniques
+
+> 💡 **New to the project?** Start with the [Quick Start Guide](docs/getting-started/quick-start.md) for a guided setup experience.
+
+---
 
 ## 📖 Usage Instructions
 
@@ -176,7 +223,7 @@ cd backend
 bun test                # Currently needs Jest/Bun compatibility fixes
 ```
 
-See [TESTS_DOC.md](TESTS_DOC.md) for detailed testing information and current status.
+See [Testing Documentation](docs/testing/testing-overview.md) for detailed testing information and current status.
 
 ## 🛡️ Error Handling
 
@@ -224,4 +271,7 @@ MIT License - see LICENSE file for details
 4. Run tests to ensure everything works
 5. Submit a pull request
 
-For development guidelines, see [CLAUDE.md](CLAUDE.md)
+For detailed development guidelines, see our [📖 Complete Documentation](docs/INDEX.md) including:
+- [Contributing Guidelines](docs/development/contributing.md)
+- [Development Best Practices](.github/instructions/Agent%20Instructions.instructions.md)
+- [Project Objectives](docs/development/project-objectives.md)
