@@ -43,18 +43,12 @@ A full-stack application to scrape Amazon product listings from search results. 
 
 ### Desktop Version
 
-<video width="100%" controls>
-  <source src="https://github.com/davidassef/Amazon-Search/raw/main/assets/videos/PreviewDesktop.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+https://github.com/davidassef/Amazon-Search/assets/PreviewDesktop.mp4
 
 <details>
 <summary>📱 Mobile Version</summary>
 
-<video width="100%" controls>
-  <source src="https://github.com/davidassef/Amazon-Search/raw/main/assets/videos/PreviewMobile.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+https://github.com/davidassef/Amazon-Search/assets/PreviewMobile.mp4
 
 </details>
 
