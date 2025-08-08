@@ -41,16 +41,17 @@ A full-stack application to scrape Amazon product listings from search results. 
 
 ## 📱 Preview
 
-### Desktop Version
+### 🖥️ Desktop Version
+[![Amazon Scraper - Desktop Demo](https://img.youtube.com/vi/hZWD44ORgY8/0.jpg)](https://www.youtube.com/watch?v=hZWD44ORgY8)
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/hZWD44ORgY8?si=FHtEANV9DRU3ypi0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<details>
+<summary>📱 Mobile Version</summary>
 
-### Mobile Version
+[![Amazon Scraper - Mobile Demo](https://img.youtube.com/vi/TumyyzScH_w/0.jpg)](https://www.youtube.com/shorts/TumyyzScH_w)
 
-<iframe width="350" height="622" src="https://www.youtube.com/embed/TumyyzScH_w" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</details>
 
-
-> 💡 **Quick Demo**: The videos above show the full application in action, including real-time search, responsive design, and multi-language support.
+> 💡 **Quick Demo**: Click the preview images above to watch the full application in action, including real-time search, responsive design, and multi-language support on YouTube.
 
 ## ✨ Features
 
