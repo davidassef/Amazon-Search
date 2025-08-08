@@ -1,3 +1,6 @@
+# Old Frontend Folder it is not deleting because of issues
+frontend-old/
+
 # Dependencies
 node_modules/
 */node_modules/
@@ -152,3 +155,8 @@ Icon?
 
 # GitHub specific files  
 .github/
+
+# Claude development files
+CLAUDE.md
+# Pycache
+__pycache__/
