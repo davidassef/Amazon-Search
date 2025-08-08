@@ -42,12 +42,13 @@ A full-stack application to scrape Amazon product listings from search results. 
 ## 📱 Preview
 
 ### Desktop Version
-https://github.com/user-attachments/assets/PreviewDesktop.mp4
+
+![Desktop Demo](https://github.com/davidassef/Amazon-Search/raw/main/assets/videos/PreviewDesktop.mp4)
 
 <details>
 <summary>📱 Mobile Version</summary>
 
-https://github.com/user-attachments/assets/PreviewMobile.mp4
+![Mobile Demo](https://github.com/davidassef/Amazon-Search/raw/main/assets/videos/PreviewMobile.mp4)
 
 </details>
 
