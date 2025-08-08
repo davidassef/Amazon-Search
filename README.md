@@ -1,5 +1,13 @@
 # Amazon Product Scraper
 
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh/)
+[![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/docs/Web/JavaScript)
+[![MIT License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
 **Description:** A full-stack web application for scraping Amazon product listings from search results, featuring a modern responsive interface and comprehensive API.
 
 **Last Updated:** August 2025
@@ -30,6 +38,20 @@
 ## 🎯 Overview
 
 A full-stack application to scrape Amazon product listings from search results. Built with Bun (backend) and Vite (frontend).
+
+## 📱 Preview
+
+### Desktop Version
+https://github.com/davidassef/Amazon-Search/assets/videos/Preview%20Desktop.webm
+
+<details>
+<summary>📱 Mobile Version</summary>
+
+https://github.com/davidassef/Amazon-Search/assets/videos/Preview%20Mobile.webm
+
+</details>
+
+> 💡 **Quick Demo**: Watch the desktop version above to see the full application in action, including real-time search, responsive design, and multi-language support.
 
 ## ✨ Features
 
