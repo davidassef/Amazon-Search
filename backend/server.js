@@ -3,6 +3,19 @@ const axios = require('axios');
 const { JSDOM } = require('jsdom');
 const cors = require('cors');
 
+const USER_AGENTS = [
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/120.0',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/119.0.0.0 Safari/537.36'
+];
+
+const getRandomUserAgent = () => USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -10,29 +23,72 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Amazon domain configuration
+const AMAZON_DOMAINS = {
+  'amazon.com': { baseUrl: 'https://www.amazon.com', language: 'en-US,en;q=0.9' },
+  'amazon.co.uk': { baseUrl: 'https://www.amazon.co.uk', language: 'en-GB,en;q=0.9' },
+  'amazon.de': { baseUrl: 'https://www.amazon.de', language: 'de-DE,de;q=0.9,en;q=0.8' },
+  'amazon.fr': { baseUrl: 'https://www.amazon.fr', language: 'fr-FR,fr;q=0.9,en;q=0.8' },
+  'amazon.ca': { baseUrl: 'https://www.amazon.ca', language: 'en-CA,en;q=0.9,fr;q=0.8' },
+  'amazon.com.au': { baseUrl: 'https://www.amazon.com.au', language: 'en-AU,en;q=0.9' },
+  'amazon.co.jp': { baseUrl: 'https://www.amazon.co.jp', language: 'ja-JP,ja;q=0.9,en;q=0.8' },
+  'amazon.in': { baseUrl: 'https://www.amazon.in', language: 'en-IN,en;q=0.9,hi;q=0.8' },
+  'amazon.com.br': { baseUrl: 'https://www.amazon.com.br', language: 'pt-BR,pt;q=0.9,en;q=0.8' },
+  'amazon.com.mx': { baseUrl: 'https://www.amazon.com.mx', language: 'es-MX,es;q=0.9,en;q=0.8' },
+  'amazon.it': { baseUrl: 'https://www.amazon.it', language: 'it-IT,it;q=0.9,en;q=0.8' },
+  'amazon.es': { baseUrl: 'https://www.amazon.es', language: 'es-ES,es;q=0.9,en;q=0.8' }
+};
+
 /**
- * Scrapes Amazon search results for a given keyword
+ * Scrapes Amazon search results for a given keyword and domain
  * @param {string} keyword - The search term
+ * @param {string} domain - The Amazon domain (e.g., 'amazon.com')
  * @returns {Promise<Array>} Array of product objects
  */
-async function scrapeAmazonProducts(keyword) {
+async function scrapeAmazonProducts(keyword, domain = 'amazon.com', retryCount = 0) {
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 2000; // 2 seconds
+  
   try {
-    // Amazon search URL with the keyword
-    const searchUrl = `https://www.amazon.com/s?k=${encodeURIComponent(keyword)}`;
+    // Add random delay to avoid rate limiting
+    await sleep(Math.random() * 1000 + 500); // 0.5-1.5 seconds
     
-    // Headers to mimic a real browser request
+    // Validate domain
+    if (!AMAZON_DOMAINS[domain]) {
+      throw new Error(`Unsupported Amazon domain: ${domain}`);
+    }
+    
+    const domainConfig = AMAZON_DOMAINS[domain];
+    
+    // Amazon search URL with the keyword for the specified domain
+    const searchUrl = `${domainConfig.baseUrl}/s?k=${encodeURIComponent(keyword)}&ref=sr_pg_1`;
+    
+    // More realistic headers with rotating user agent
     const headers = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      'Accept-Language': 'en-US,en;q=0.9',
+      'User-Agent': getRandomUserAgent(),
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+      'Accept-Language': domainConfig.language,
       'Accept-Encoding': 'gzip, deflate, br',
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
       'Connection': 'keep-alive',
       'Upgrade-Insecure-Requests': '1',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+      'Sec-Ch-Ua-Mobile': '?0',
+      'Sec-Ch-Ua-Platform': '"Windows"',
+      'Cache-Control': 'max-age=0',
+      'DNT': '1'
     };
 
-    // Fetch the Amazon search results page
-    console.log(`Fetching Amazon search results for: ${keyword}`);
-    const response = await axios.get(searchUrl, { headers });
+    // Fetch the Amazon search results page with timeout
+    console.log(`Fetching ${domain} search results for: ${keyword} (attempt ${retryCount + 1})`);
+    const response = await axios.get(searchUrl, { 
+      headers,
+      timeout: 10000, // 10 second timeout
+      maxRedirects: 5
+    });
     
     // Parse HTML with JSDOM
     const dom = new JSDOM(response.data);
@@ -119,9 +175,9 @@ async function scrapeAmazonProducts(keyword) {
             if (href.startsWith('http')) {
               productUrl = href;
             } else if (href.startsWith('/')) {
-              productUrl = `https://www.amazon.com${href}`;
+              productUrl = `${domainConfig.baseUrl}${href}`;
             } else {
-              productUrl = `https://www.amazon.com/${href}`;
+              productUrl = `${domainConfig.baseUrl}/${href}`;
             }
             console.log(`Extracted URL: ${productUrl}`);
           } else {
@@ -134,7 +190,7 @@ async function scrapeAmazonProducts(keyword) {
         // Fallback: Generate search URL if no specific URL found
         if (productUrl === 'N/A' && title !== 'N/A') {
           const searchTerm = title.substring(0, 100); // Limit length for URL
-          productUrl = `https://www.amazon.com/s?k=${encodeURIComponent(searchTerm)}`;
+          productUrl = `${domainConfig.baseUrl}/s?k=${encodeURIComponent(searchTerm)}`;
           console.log(`Generated fallback search URL for: ${title.substring(0, 30)}...`);
         }
         
@@ -223,6 +279,21 @@ async function scrapeAmazonProducts(keyword) {
     
   } catch (error) {
     console.error('Error scraping Amazon:', error.message);
+    
+    // Retry logic for certain error types
+    if (retryCount < MAX_RETRIES && 
+        (error.response?.status === 503 || 
+         error.response?.status === 429 ||
+         error.code === 'ECONNRESET' ||
+         error.code === 'ETIMEDOUT')) {
+      
+      const delay = RETRY_DELAY * Math.pow(2, retryCount); // Exponential backoff
+      console.log(`Retrying in ${delay}ms... (${retryCount + 1}/${MAX_RETRIES})`);
+      
+      await sleep(delay);
+      return scrapeAmazonProducts(keyword, domain, retryCount + 1);
+    }
+    
     throw error;
   }
 }
@@ -233,7 +304,7 @@ async function scrapeAmazonProducts(keyword) {
  */
 app.get('/api/scrape', async (req, res) => {
   try {
-    const { keyword } = req.query;
+    const { keyword, domain } = req.query;
     
     // Validate keyword parameter
     if (!keyword) {
@@ -250,15 +321,25 @@ app.get('/api/scrape', async (req, res) => {
       });
     }
     
-    console.log(`Scraping request for keyword: ${keyword}`);
+    // Validate domain parameter
+    const amazonDomain = domain || 'amazon.com';
+    if (!AMAZON_DOMAINS[amazonDomain]) {
+      return res.status(400).json({
+        success: false,
+        error: `Unsupported Amazon domain: ${amazonDomain}. Supported domains: ${Object.keys(AMAZON_DOMAINS).join(', ')}`
+      });
+    }
+    
+    console.log(`Scraping request for keyword: ${keyword} on ${amazonDomain}`);
     
     // Scrape Amazon products
-    const products = await scrapeAmazonProducts(keyword);
+    const products = await scrapeAmazonProducts(keyword, amazonDomain);
     
     // Return successful response
     res.json({
       success: true,
       keyword,
+      domain: amazonDomain,
       totalProducts: products.length,
       products: products.slice(0, 20) // Limit to first 20 products
     });
@@ -299,10 +380,13 @@ app.get('/', (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Amazon Scraper API running on http://localhost:${PORT}`);
-  console.log(`📡 Scrape endpoint: http://localhost:${PORT}/api/scrape?keyword=<search-term>`);
-});
+// Start server only if this file is run directly (not imported for testing)
+let server;
+if (require.main === module) {
+  server = app.listen(PORT, () => {
+    console.log(`🚀 Amazon Scraper API running on http://localhost:${PORT}`);
+    console.log(`📡 Scrape endpoint: http://localhost:${PORT}/api/scrape?keyword=<search-term>`);
+  });
+}
 
-module.exports = { app, scrapeAmazonProducts };
+module.exports = { app, server, scrapeAmazonProducts, AMAZON_DOMAINS };
