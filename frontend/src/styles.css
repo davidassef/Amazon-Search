@@ -41,6 +41,13 @@
   }
 }
 
+/* Twemoji emoji images (flags) sizing */
+.emoji {
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.15em;
+}
+
 /* Component styles */
 @layer components {
   /* Form elements */
@@ -117,6 +124,51 @@
     @apply w-full px-4 py-3 rounded-lg border-2 
            border-gray-200 focus:border-amazon-orange
            focus:ring-2 focus:ring-amazon-orange/20;
+  }
+
+  /* Filter styles */
+  .filter-panel {
+    @apply transition-all duration-300 ease-in-out overflow-hidden;
+  }
+  
+  .filter-panel-enter, .filter-panel-enter-active {
+    @apply max-h-0 opacity-0;
+  }
+  
+  .filter-panel-enter-done {
+    @apply max-h-[500px] opacity-100;
+  }
+  
+  .filter-panel-exit {
+    @apply max-h-[500px] opacity-100;
+  }
+  
+  .filter-panel-exit-active {
+    @apply max-h-0 opacity-0;
+  }
+  
+  .filter-group {
+    @apply space-y-2;
+  }
+  
+  .filter-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+  
+  .filter-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amazon-orange focus:border-amazon-orange;
+  }
+  
+  .filter-checkbox {
+    @apply h-4 w-4 text-amazon-orange focus:ring-amazon-orange border-gray-300 rounded;
+  }
+  
+  .filter-button {
+    @apply w-full bg-amazon-orange hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-md transition-colors;
+  }
+  
+  .sort-select {
+    @apply appearance-none bg-white border border-gray-300 rounded-lg pl-3 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-amazon-orange focus:border-amazon-orange text-sm;
   }
 
   /* Product cards */
@@ -289,6 +341,17 @@
 
 /* Utility layer for custom utilities */
 @layer utilities {
+  /* Remove number input spin buttons (Chrome, Safari, Edge, Opera) */
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Remove number input spin buttons (Firefox) */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
   /* Text selection */
   .select-none {
     -webkit-user-select: none;
