@@ -194,16 +194,26 @@ async function scrapeAmazonProducts(keyword, domain = 'amazon.com', retryCount =
           console.log(`Generated fallback search URL for: ${title.substring(0, 30)}...`);
         }
         
-        // Extract rating (stars)
+        // Extract rating (stars) - language agnostic and resilient
+        // Support EN (star/stars), ES (estrella/estrellas), PT (estrela/estrelas)
         const ratingElement = element.querySelector('.a-icon-alt') ||
-                             element.querySelector('[aria-label*="star"]');
+                              element.querySelector('[aria-label*="star" i]') ||
+                              element.querySelector('[aria-label*="estrella" i]') ||
+                              element.querySelector('[aria-label*="estrellas" i]') ||
+                              element.querySelector('[aria-label*="estrela" i]') ||
+                              element.querySelector('[aria-label*="estrelas" i]');
         
         let rating = 'N/A';
         if (ratingElement) {
-          const ratingText = ratingElement.getAttribute('aria-label') || ratingElement.textContent;
-          const ratingMatch = ratingText.match(/(\d+\.?\d*)\s*(out\s*of\s*5\s*stars?|stars?)/i);
-          if (ratingMatch) {
-            rating = ratingMatch[1];
+          const ratingText = (ratingElement.getAttribute('aria-label') || ratingElement.textContent || '').trim();
+          // Extract first numeric value regardless of surrounding words, normalize comma to dot
+          const numMatch = ratingText.match(/\d+[\.,]?\d*/);
+          if (numMatch) {
+            const num = parseFloat(numMatch[0].replace(',', '.'));
+            if (!Number.isNaN(num)) {
+              // Clamp between 0 and 5 as Amazon ratings are 0..5
+              rating = Math.max(0, Math.min(5, num)).toString();
+            }
           }
         }
         
