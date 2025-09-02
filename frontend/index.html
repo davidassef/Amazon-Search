@@ -22,6 +22,8 @@
                         <option value="pt">🇧🇷 Português</option>
                         <option value="es">🇪🇸 Español</option>
                     </select>
+                    <!-- Custom language dropdown container (progressive enhancement) -->
+                    <div id="language-custom" class="relative hidden md:block"></div>
                 </div>
             </div>
         </div>
@@ -80,6 +82,8 @@
                             <option value="br">🇧🇷 Brazil</option>
                             <option value="mx">🇲🇽 Mexico</option>
                         </select>
+                        <!-- Custom country dropdown container (progressive enhancement) -->
+                        <div id="country-custom" class="relative hidden md:block"></div>
                     </div>
                 </div>
                 
@@ -100,14 +104,105 @@
 
         <!-- Results Section -->
         <section id="results-section" class="results-section hidden">
-            <div class="results-header mb-6">
-                <h2 class="text-2xl font-bold text-gray-900" data-i18n="resultsTitle">Search Results</h2>
-                <p class="text-gray-600 mt-1">
-                    <span id="results-count"></span>
-                    <span id="results-keyword"></span>
-                </p>
+            <div class="results-header mb-8 space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900" data-i18n="resultsTitle">Search Results</h2>
+                        <p class="text-gray-600 mt-1">
+                            <span id="results-count"></span>
+                            <span id="results-keyword"></span>
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button id="filter-toggle" class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 7.707A1 1 0 013 7V3z" clip-rule="evenodd" />
+                            </svg>
+                            <span data-i18n="filters">Filters</span>
+                        </button>
+                        <div class="relative">
+                            <select id="sort-by" class="appearance-none bg-white border border-gray-300 rounded-lg pl-3 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-amazon-orange focus:border-amazon-orange">
+                                <option value="relevance" data-i18n="sortRelevance">Relevance</option>
+                                <option value="price-asc" data-i18n="sortPriceAsc">Price: Low to High</option>
+                                <option value="price-desc" data-i18n="sortPriceDesc">Price: High to Low</option>
+                                <option value="rating-asc" data-i18n="sortRatingAsc">Lowest Rated</option>
+                                <option value="rating-desc" data-i18n="sortRating">Top Rated</option>
+                                <option value="date-desc" data-i18n="sortDateDesc">Newest</option>
+                                <option value="date-asc" data-i18n="sortDateAsc">Oldest</option>
+                                <option value="newest" data-i18n="sortNewest">Newest Arrivals</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filtros -->
+                <div id="filters-panel" class="hidden mt-8 mb-6 p-6 md:p-8 bg-white rounded-xl shadow-md border border-gray-200">
+                    <form id="filters-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <!-- Filtro de Preço -->
+                        <div class="space-y-2">
+                            <label for="min-price" class="block text-sm font-medium text-gray-700" data-i18n="priceRange">Price Range</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="min-price" placeholder="Min" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange" data-i18n-placeholder="minPrice">
+                                <span class="text-gray-500">-</span>
+                                <input type="number" id="max-price" placeholder="Max" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange" data-i18n-placeholder="maxPrice">
+                            </div>
+                        </div>
+                        
+                        <!-- Filtro de Avaliação -->
+                        <div class="space-y-2">
+                            <label for="min-rating" class="block text-sm font-medium text-gray-700" data-i18n="minRating">Minimum Rating</label>
+                            <select id="min-rating" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange">
+                                <option value="" data-i18n="anyRating">Any Rating</option>
+                                <option value="4">4+ stars & Up</option>
+                                <option value="3">3+ stars & Up</option>
+                                <option value="2">2+ stars & Up</option>
+                                <option value="1">1+ stars & Up</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filtro de Marca -->
+                        <div class="space-y-2">
+                            <label for="brand" class="block text-sm font-medium text-gray-700" data-i18n="brand">Brand</label>
+                            <input type="text" id="brand" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange" data-i18n-placeholder="brandPlaceholder" placeholder="e.g. Apple, Samsung">
+                        </div>
+
+                        <!-- Filtro de Data -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700" data-i18n="dateRange">Date Range</label>
+                            <div class="flex flex-col gap-2">
+                                <input type="date" id="date-from" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange" aria-label="Start date" data-i18n-placeholder="startDate">
+                                <input type="date" id="date-to" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange" aria-label="End date" data-i18n-placeholder="endDate">
+                            </div>
+                        </div>
+
+                        <!-- Filtro de Frete Grátis -->
+                        <div class="space-y-2 flex items-end">
+                            <div class="flex items-center h-5">
+                                <input id="free-shipping" type="checkbox" class="h-4 w-4 text-amazon-orange focus:ring-amazon-orange border-gray-300 rounded">
+                                <label for="free-shipping" class="ml-2 block text-sm text-gray-700" data-i18n="freeShipping">Free Shipping</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Botão Aplicar Filtros -->
+                        <div class="flex items-end">
+                            <button type="submit" id="apply-filters" class="w-full bg-amazon-orange hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-md transition-colors" data-i18n="applyFilters">
+                                <span data-i18n="applyFilters">Apply Filters</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                </div>
             </div>
-            
+
+            <!-- Active filters summary chips -->
+            <div id="filters-summary" class="hidden mt-4"></div>
+
             <div id="results-grid" class="results-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 <!-- Product cards will be inserted here -->
             </div>
@@ -140,6 +235,8 @@
         </div>
     </footer>
 
+    <!-- Twemoji for reliable cross-platform emoji rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js"></script>
     <script type="module" src="main.js"></script>
 </body>
 </html>
