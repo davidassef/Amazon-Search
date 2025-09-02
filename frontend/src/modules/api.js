@@ -1,4 +1,26 @@
 // API communication module
+// UUID helper com fallback para ambientes sem crypto.randomUUID
+const uid = () => {
+  try {
+    if (typeof crypto !== 'undefined') {
+      if (typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+      }
+      if (typeof crypto.getRandomValues === 'function') {
+        const buf = new Uint8Array(16);
+        crypto.getRandomValues(buf);
+        // Ajuste de bits conforme RFC 4122 v4
+        buf[6] = (buf[6] & 0x0f) | 0x40;
+        buf[8] = (buf[8] & 0x3f) | 0x80;
+        const b = Array.from(buf, x => x.toString(16).padStart(2, '0'));
+        return `${b[0]}${b[1]}${b[2]}${b[3]}-${b[4]}${b[5]}-${b[6]}${b[7]}-${b[8]}${b[9]}-${b[10]}${b[11]}${b[12]}${b[13]}${b[14]}${b[15]}`;
+      }
+    }
+  } catch {}
+  // Fallback simples (não-criptográfico)
+  const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+  return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
+};
 export class API {
   constructor(baseURL = undefined) {
     // Allow configuration via environment variable with fallback to '/api'
@@ -54,6 +76,46 @@ export class API {
       throw new Error(data.error || 'API_ERROR');
     }
 
+    // Helper interno para extrair rating com robustez de múltiplas chaves
+    /**
+     * Extrai a avaliação (0-5) a partir de possíveis chaves do item do backend.
+     * Aceita number direto ou string em formatos "4,5", "4.5", "4.5 out of 5".
+     * Retorna null se não conseguir extrair número válido.
+     */
+    const extractRating = (item) => {
+      const keys = [
+        'rating',
+        'ratingText',
+        'stars',
+        'starsText',
+        'averageRating',
+        'avgRating',
+        'rating_value',
+        'ratingValue',
+        'ratingOutOf5',
+        'score'
+      ];
+      for (const k of keys) {
+        if (k in item && item[k] != null && item[k] !== 'N/A') {
+          const v = item[k];
+          if (typeof v === 'number') {
+            const n = Math.max(0, Math.min(5, v));
+            return Number.isFinite(n) ? n : null;
+          }
+          const str = String(v).trim();
+          const m = str.match(/\d+[\.,]?\d*/);
+          if (m) {
+            const n = parseFloat(m[0].replace(',', '.'));
+            if (!Number.isNaN(n)) {
+              const clamped = Math.max(0, Math.min(5, n));
+              return clamped;
+            }
+          }
+        }
+      }
+      return null;
+    };
+
     // Normalize response shape
     const products = (data.products || []).map((item) => {
       // Normalize values from backend keys
@@ -65,13 +127,8 @@ export class API {
       const priceRaw = item.price ?? item.priceText ?? null;
       const price = priceRaw && priceRaw !== 'N/A' ? priceRaw : null;
 
-      // Normalize rating to a number if possible
-      let rating = null;
-      if (typeof item.rating === 'number') rating = item.rating;
-      else if (typeof item.rating === 'string' && item.rating !== 'N/A') {
-        const n = parseFloat(item.rating.replace(',', '.'));
-        rating = Number.isNaN(n) ? null : n;
-      }
+      // Normalize rating a partir de múltiplas chaves
+      const rating = extractRating(item);
 
       // Normalize reviews to integer
       let reviews = 0;
@@ -82,7 +139,7 @@ export class API {
       }
 
       return {
-        id: item.id || item.asin || crypto.randomUUID(),
+        id: item.id || item.asin || uid(),
         title,
         url,
         image,
@@ -92,12 +149,12 @@ export class API {
       };
     });
 
+    // Não lançar erro se não houver produtos; permitir UI mostrar "sem resultados"
     if (!products.length) {
-      const err = new Error('NO_PRODUCTS_FOUND');
-      throw err;
+      return { products: [], total: 0 };
     }
 
-    return { products };
+    return { products, total: products.length };
   }
 }
 

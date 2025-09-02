@@ -1,0 +1,20 @@
+{
+  "filters": "Filtros",
+  "sortBy": "Ordenar por",
+  "priceRange": "Rango de Precios",
+  "minPrice": "Precio Mín",
+  "maxPrice": "Precio Máx",
+  "minRating": "Calificación Mínima",
+  "freeShipping": "Envío Gratis",
+  "applyFilters": "Aplicar Filtros",
+  "clearAll": "Limpiar Todo",
+  "activeFilters": "Filtros Activos",
+  "stars": "estrellas",
+  "sortRelevance": "Relevancia",
+  "sortPriceAsc": "Precio: Menor a Mayor",
+  "sortPriceDesc": "Precio: Mayor a Menor",
+  "sortRating": "Mejor Valorados",
+  "sortNewest": "Más Recientes",
+  "noResults": "No se encontraron productos con los filtros seleccionados.",
+  "resetFilters": "Restablecer Filtros"
+}

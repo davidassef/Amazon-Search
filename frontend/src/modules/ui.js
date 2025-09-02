@@ -2,6 +2,8 @@
 export class UI {
   constructor(i18n) {
     this.i18n = i18n; // Use shared i18n instance
+    this.currentResults = [];
+    this.currentKeyword = '';
   }
 
   // Loading state handlers
@@ -49,19 +51,45 @@ export class UI {
     const resultsGrid = document.getElementById('results-grid');
     const resultsCount = document.getElementById('results-count');
     const resultsKeyword = document.getElementById('results-keyword');
+    const noResults = document.getElementById('no-results');
+    const filtersSummary = document.getElementById('filters-summary');
 
     if (!resultsSection || !resultsGrid) return;
 
+    // Store current results and keyword
+    this.currentResults = Array.isArray(products) ? [...products] : [];
+    this.currentKeyword = keyword || '';
+
     // Update header info
+    const hasResults = products.length > 0;
     resultsCount.textContent = this.i18n.t('resultsCount', { count: products.length });
     resultsKeyword.textContent = ` ${this.i18n.t('resultsKeyword', { keyword })}`;
+    
+    // Toggle no results message
+    if (noResults) {
+      noResults.classList.toggle('hidden', hasResults);
+    }
+    
+    // Toggle filters summary
+    if (filtersSummary) {
+      filtersSummary.classList.toggle('hidden', !hasResults);
+    }
 
-    // Render product cards
-    resultsGrid.innerHTML = products.map((p) => this.renderProductCard(p)).join('');
+    // Render product cards or no results message
+    if (hasResults) {
+      resultsGrid.innerHTML = products.map((p) => this.renderProductCard(p)).join('');
+      resultsGrid.classList.remove('hidden');
+    } else {
+      resultsGrid.innerHTML = '';
+      resultsGrid.classList.add('hidden');
+    }
 
     // Show section
     resultsSection.classList.remove('hidden');
     resultsSection.classList.add('slide-in');
+    
+    // Update filters summary
+    this.updateFiltersSummary();
   }
 
   renderProductCard(product) {
@@ -89,7 +117,16 @@ export class UI {
 
   renderStars(rating) {
     const maxStars = 5;
-    const filled = Math.round(Math.min(Math.max(rating, 0), maxStars));
+    // Parse rating safely from possible formats like "4.5", "4,5", "4.5 out of 5"
+    const numeric = (() => {
+      if (typeof rating === 'number') return rating;
+      const str = String(rating).trim();
+      const m = str.match(/\d+[\.,]?\d*/);
+      if (!m) return 0;
+      return parseFloat(m[0].replace(',', '.')) || 0;
+    })();
+    const clamped = Math.min(Math.max(numeric, 0), maxStars);
+    const filled = Math.round(clamped);
     const empty = maxStars - filled;
 
     const starFilled = '<svg class="star star-filled" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.2 3.674a1 1 0 00.95.69h3.862c.969 0 1.371 1.24.588 1.81l-3.125 2.27a1 1 0 00-.364 1.118l1.2 3.674c.3.921-.755 1.688-1.538 1.118l-3.125-2.27a1 1 0 00-1.176 0l-3.125 2.27c-.783.57-1.838-.197-1.538-1.118l1.2-3.674a1 1 0 00-.364-1.118L2.349 9.1c-.783-.57-.38-1.81.588-1.81h3.862a1 1 0 00.95-.69l1.2-3.674z"/></svg>';
@@ -177,6 +214,183 @@ export class UI {
       </article>`;
 
     container.innerHTML = new Array(count).fill(card).join('');
+  }
+  
+  // Update filters summary based on active filters
+  updateFiltersSummary() {
+    const filtersSummary = document.getElementById('filters-summary');
+    const activeFilters = [];
+    
+    // Check price range
+    const minPrice = document.getElementById('min-price')?.value;
+    const maxPrice = document.getElementById('max-price')?.value;
+    
+    if (minPrice) {
+      activeFilters.push({
+        key: 'minPrice',
+        label: `${this.i18n.t('minPrice')}: $${minPrice}`,
+        value: minPrice
+      });
+    }
+    if (maxPrice) {
+      activeFilters.push({
+        key: 'maxPrice',
+        label: `${this.i18n.t('maxPrice')}: $${maxPrice}`,
+        value: maxPrice
+      });
+    }
+    
+    // Check rating
+    const minRating = document.getElementById('min-rating')?.value;
+    if (minRating) {
+      activeFilters.push({
+        key: 'minRating',
+        label: `${minRating}+ ${this.i18n.t('stars')}`,
+        value: minRating
+      });
+    }
+    
+    // Check brand
+    const brand = document.getElementById('brand')?.value;
+    if (brand && brand.trim().length > 0) {
+      activeFilters.push({
+        key: 'brand',
+        label: `${this.i18n.t('brand')}: ${brand.trim()}`,
+        value: brand.trim()
+      });
+    }
+
+    // Check date range
+    const dateFrom = document.getElementById('date-from')?.value;
+    const dateTo = document.getElementById('date-to')?.value;
+    if (dateFrom || dateTo) {
+      const fromLabel = dateFrom ? new Date(dateFrom).toLocaleDateString() : '—';
+      const toLabel = dateTo ? new Date(dateTo).toLocaleDateString() : '—';
+      activeFilters.push({
+        key: 'dateRange',
+        label: `${this.i18n.t('dateRange')}: ${fromLabel} - ${toLabel}`,
+        value: `${dateFrom || ''}|${dateTo || ''}`
+      });
+    }
+
+    // Check free shipping
+    const freeShipping = document.getElementById('free-shipping')?.checked;
+    if (freeShipping) {
+      activeFilters.push({
+        key: 'freeShipping',
+        label: this.i18n.t('freeShipping'),
+        value: true
+      });
+    }
+    
+    // Update UI
+    if (filtersSummary) {
+      if (activeFilters.length > 0) {
+        filtersSummary.innerHTML = `
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-sm font-medium text-gray-700">${this.i18n.t('activeFilters')}:</span>
+            ${activeFilters.map(filter => `
+              <div class="flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full border border-blue-100">
+                <span>${filter.label}</span>
+                <button 
+                  class="ml-1 text-blue-500 hover:text-blue-700 focus:outline-none"
+                  data-filter-key="${filter.key}"
+                  aria-label="${this.i18n.t('removeFilter')}"
+                >
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+            `).join('')}
+            <button 
+              id="clear-filters" 
+              class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1 px-2 py-1 hover:bg-blue-50 rounded-md transition-colors"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              <span>${this.i18n.t('clearAll')}</span>
+            </button>
+          </div>
+        `;
+        
+        // Add event listeners to clear filters buttons
+        activeFilters.forEach(filter => {
+          const removeBtn = filtersSummary.querySelector(`[data-filter-key="${filter.key}"]`);
+          if (removeBtn) {
+            removeBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              this.clearSingleFilter(filter.key);
+            });
+          }
+        });
+        
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        if (clearFiltersBtn) {
+          clearFiltersBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.clearFilters();
+          });
+        }
+        
+        filtersSummary.classList.remove('hidden');
+      } else {
+        filtersSummary.classList.add('hidden');
+      }
+    }
+  }
+  
+  // Clear a single filter
+  clearSingleFilter(filterKey) {
+    switch(filterKey) {
+      case 'minPrice':
+        document.getElementById('min-price').value = '';
+        break;
+      case 'maxPrice':
+        document.getElementById('max-price').value = '';
+        break;
+      case 'minRating':
+        document.getElementById('min-rating').value = '';
+        break;
+      case 'brand':
+        document.getElementById('brand').value = '';
+        break;
+      case 'dateRange':
+        if (document.getElementById('date-from')) document.getElementById('date-from').value = '';
+        if (document.getElementById('date-to')) document.getElementById('date-to').value = '';
+        break;
+      case 'freeShipping':
+        document.getElementById('free-shipping').checked = false;
+        break;
+    }
+    
+    // Trigger filter change via form submit (so main.js can handle it)
+    const form = document.getElementById('filters-form');
+    if (form) {
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    }
+  }
+  
+  // Clear all filters
+  clearFilters() {
+    // Reset form inputs
+    const form = document.getElementById('filters-form');
+    if (form) {
+      form.reset();
+    }
+    
+    // Reset sort to default
+    const sortBy = document.getElementById('sort-by');
+    if (sortBy) {
+      sortBy.value = 'relevance';
+    }
+    
+    // Trigger filter change via form submit (handled by main.js)
+    const formEl = document.getElementById('filters-form');
+    if (formEl) {
+      formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    }
   }
 }
 
