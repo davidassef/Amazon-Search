@@ -21,7 +21,7 @@ class AmazonScraper {
         this.currentSearchController = null;
         this.currentResults = [];
         this.currentKeyword = '';
-        this.currentCountry = 'us';
+        this.selectedCountries = ['us'];
         
         this.init();
     }
@@ -39,14 +39,14 @@ class AmazonScraper {
             
             // Apply initial translations
             this.i18n.applyTranslations();
-            // Build custom country dropdown (progressive enhancement)
-            this.buildCustomCountryDropdown();
-            // Ensure emojis render with Twemoji
-            this.renderTwemoji(document.getElementById('country-custom'));
+
             // Build custom language dropdown (progressive enhancement)
             this.buildCustomLanguageDropdown();
             this.renderTwemoji(document.getElementById('language-custom'));
             
+            // Build multi-select country dropdown
+            this.buildCountryMultiSelect();
+
             console.log('Amazon Scraper initialized successfully');
         } catch (error) {
             console.error('Failed to initialize application:', error);
@@ -65,12 +65,12 @@ class AmazonScraper {
         // Keep custom language dropdown in sync
         languageSelect?.addEventListener('change', () => this.updateCustomLanguageSelected());
         
-        // Country selection
-        const countrySelect = document.getElementById('country-select');
-        countrySelect?.addEventListener('change', (e) => this.handleCountryChange(e));
-        // Keep custom dropdown in sync when native select changes programmatically
-        countrySelect?.addEventListener('change', () => this.updateCustomCountrySelected());
-        
+        // Country multiselect
+        const countryMultiSelectButton = document.getElementById('country-multiselect-button');
+        countryMultiSelectButton?.addEventListener('click', () => {
+            document.getElementById('country-multiselect-dropdown').classList.toggle('hidden');
+        });
+
         // Search input for suggestions
         const searchInput = document.getElementById('search-input');
         searchInput?.addEventListener('input', (e) => this.handleSearchInput(e));
@@ -113,11 +113,9 @@ class AmazonScraper {
         }
         
         // Load country preference
-        const savedCountry = this.storage.get('country', 'us');
-        const countrySelect = document.getElementById('country-select');
-        if (countrySelect) {
-            countrySelect.value = savedCountry;
-        }
+        const savedCountries = this.storage.get('countries', ['us']);
+        this.selectedCountries = savedCountries;
+        this.updateCountryMultiSelectButton();
         
         // Load recent searches
         const recentSearches = this.storage.get('recentSearches', []);
@@ -132,10 +130,11 @@ class AmazonScraper {
         }
         
         const searchInput = document.getElementById('search-input');
-        const countrySelect = document.getElementById('country-select');
-        
         const keyword = searchInput?.value.trim();
-        const country = countrySelect?.value || 'us';
+        const convertCurrencyCheckbox = document.getElementById('convert-currency-checkbox');
+        const currencySelect = document.getElementById('currency-select');
+
+        const convertCurrency = convertCurrencyCheckbox.checked ? currencySelect.value : null;
         
         // Validate input
         if (!keyword) {
@@ -149,11 +148,15 @@ class AmazonScraper {
             searchInput?.focus();
             return;
         }
+
+        if (this.selectedCountries.length === 0) {
+            this.ui.showError(this.i18n.t('countryRequired'));
+            return;
+        }
         
         try {
             this.isSearching = true;
             this.currentKeyword = keyword;
-            this.currentCountry = country;
             
             this.ui.showLoading();
             this.ui.hideSuggestions();
@@ -165,22 +168,18 @@ class AmazonScraper {
             this.updateLoadingStatus();
             
             // Perform the search
-            const results = await this.api.searchProducts(keyword, country, {
+            const results = await this.api.searchProducts(keyword, this.selectedCountries, convertCurrency, {
                 signal: this.currentSearchController.signal,
                 onProgress: (status) => this.updateLoadingMessage(status)
             });
             
             // Handle successful results
-            if (results && results.products && results.products.length > 0) {
-                this.currentResults = results.products;
+            const isComparison = this.selectedCountries.length > 1;
+            this.ui.showResults(results, this.currentKeyword, isComparison);
+            if (!isComparison) {
                 this.applyFilters();
-                this.saveRecentSearch(keyword);
-            } else {
-                this.currentResults = [];
-                // Mostrar estado de "sem resultados" em vez de erro
-                this.ui.showResults([], this.currentKeyword);
-                this.saveRecentSearch(keyword);
             }
+            this.saveRecentSearch(keyword);
             
         } catch (error) {
             console.error('Search error:', error);
@@ -379,113 +378,79 @@ class AmazonScraper {
     }
 
     // ============================
-    // Custom Country Dropdown (PE)
+    // Custom Country MultiSelect
     // ============================
-    buildCustomCountryDropdown() {
-        const container = document.getElementById('country-custom');
-        const select = document.getElementById('country-select');
-        if (!container || !select) return;
+    buildCountryMultiSelect() {
+        const dropdown = document.getElementById('country-multiselect-dropdown');
+        const button = document.getElementById('country-multiselect-button');
+        if (!dropdown || !button) return;
 
-        if (!ENABLE_CUSTOM_COUNTRY) {
-            this.teardownCustomCountryDropdown();
-            return;
+        const countries = [
+            { code: 'us', name: 'United States' },
+            { code: 'ca', name: 'Canada' },
+            { code: 'uk', name: 'United Kingdom' },
+            { code: 'de', name: 'Germany' },
+            { code: 'fr', name: 'France' },
+            { code: 'es', name: 'Spain' },
+            { code: 'it', name: 'Italy' },
+            { code: 'jp', name: 'Japan' },
+            { code: 'au', name: 'Australia' },
+            { code: 'in', name: 'India' },
+            { code: 'br', name: 'Brazil' },
+            { code: 'mx', name: 'Mexico' },
+        ];
+
+        const list = dropdown.querySelector('ul');
+        list.innerHTML = countries.map(country => {
+            const flag = this.i18n.flags[country.code] || this.i18n.flagFromCountryCode(country.code);
+            return `
+            <li>
+                <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <input type="checkbox" value="${country.code}" class="form-checkbox h-4 w-4 text-amazon-orange focus:ring-amazon-orange border-gray-300 rounded">
+                    <span class="ml-3 text-sm text-gray-700">${flag} ${country.name}</span>
+                </label>
+            </li>
+        `}).join('');
+
+        list.addEventListener('change', (e) => {
+            if (e.target.type === 'checkbox') {
+                const selected = Array.from(list.querySelectorAll('input:checked')).map(input => input.value);
+                if (selected.length > 3) {
+                    e.target.checked = false;
+                    alert('You can select up to 3 regions.');
+                    return;
+                }
+                this.selectedCountries = selected;
+                this.storage.set('countries', this.selectedCountries);
+                this.updateCountryMultiSelectButton();
+            }
+        });
+
+        // Set initial state
+        this.selectedCountries.forEach(code => {
+            const checkbox = list.querySelector(`input[value="${code}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
+        this.updateCountryMultiSelectButton();
+    }
+
+    updateCountryMultiSelectButton() {
+        const button = document.getElementById('country-multiselect-button');
+        if (!button) return;
+
+        if (this.selectedCountries.length === 0) {
+            button.innerHTML = `<span>${this.i18n.t('selectRegions')}</span>`;
+        } else {
+            const selectedFlags = this.selectedCountries.map(code => this.i18n.flags[code] || this.i18n.flagFromCountryCode(code)).join(' ');
+            button.innerHTML = `<span>${selectedFlags}</span>`;
         }
 
-        // Build items from native select
-        const opts = [...select.options].map(opt => {
-            const code = opt.value;
-            const normalized = code?.toLowerCase() === 'uk' ? 'gb' : (code || '').toLowerCase();
-            const flag = opt.dataset.flag
-                || this.i18n.extractLeadingEmoji(opt.textContent)
-                || this.i18n.flags[normalized]
-                || this.i18n.flagFromCountryCode(normalized)
-                || '';
-            const label = this.i18n.getCountryName(code);
-            return { code, flag, label };
-        });
-
-        // Render dropdown
-        const current = select.value || opts[0]?.code || 'us';
-        const currentItem = opts.find(o => o.code === current) || opts[0];
-        container.innerHTML = `
-            <div class="relative inline-block text-left">
-                <button id="country-dd-btn" type="button" class="inline-flex w-full justify-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none" aria-haspopup="listbox" aria-expanded="false">
-                    <span class="text-base">${currentItem?.flag || ''}</span>
-                    <span>${currentItem?.label || ''}</span>
-                    <svg class="-mr-1 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/></svg>
-                </button>
-                <ul id="country-dd-list" class="absolute z-20 mt-1 max-h-60 w-56 overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="listbox">
-                    ${opts.map(o => `
-                        <li class="cursor-pointer select-none px-3 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2" role="option" data-value="${o.code}">
-                            <span class="text-base">${o.flag}</span>
-                            <span>${o.label}</span>
-                        </li>`).join('')}
-                </ul>
-            </div>
-        `;
-
-        // Hide native select but keep for form behavior
-        select.classList.add('hidden');
-        const btn = container.querySelector('#country-dd-btn');
-        const list = container.querySelector('#country-dd-list');
-        const toggle = () => list.classList.toggle('hidden');
-        const close = () => list.classList.add('hidden');
-
-        btn?.addEventListener('click', (e) => {
-            e.preventDefault();
-            toggle();
-        });
-        list?.querySelectorAll('[data-value]')?.forEach(item => {
-            item.addEventListener('click', () => {
-                const val = item.getAttribute('data-value');
-                if (!val) return;
-                select.value = val;
-                // Trigger native change
-                select.dispatchEvent(new Event('change', { bubbles: true }));
-                // Update button label
-                const found = opts.find(o => o.code === val);
-                if (found) btn.innerHTML = `<span class="text-base">${found.flag}</span><span>${found.label}</span><svg class=\"-mr-1 h-4 w-4 text-gray-500\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z\" clip-rule=\"evenodd\"/></svg>`;
-                close();
-            });
-        });
-
-        // Click outside to close
-        this._countryOutsideHandler = (ev) => {
-            if (!container.contains(ev.target)) close();
-        };
-        document.addEventListener('click', this._countryOutsideHandler);
-    }
-
-    teardownCustomCountryDropdown() {
-        const container = document.getElementById('country-custom');
-        const select = document.getElementById('country-select');
-        if (container) container.innerHTML = '';
-        if (select) select.classList.remove('hidden');
-        if (this._countryOutsideHandler) {
-            document.removeEventListener('click', this._countryOutsideHandler);
-            this._countryOutsideHandler = null;
+        const comparisonOptions = document.getElementById('comparison-options');
+        if (this.selectedCountries.length > 1) {
+            comparisonOptions.classList.remove('hidden');
+        } else {
+            comparisonOptions.classList.add('hidden');
         }
-    }
-
-    updateCustomCountryLabels() {
-        if (!ENABLE_CUSTOM_COUNTRY) return;
-        // Rebuild to re-render translated names and flags
-        this.buildCustomCountryDropdown();
-        this.renderTwemoji(document.getElementById('country-custom'));
-    }
-
-    updateCustomCountrySelected() {
-        if (!ENABLE_CUSTOM_COUNTRY) return;
-        const container = document.getElementById('country-custom');
-        const select = document.getElementById('country-select');
-        const btn = container?.querySelector('#country-dd-btn');
-        if (!container || !select || !btn) return;
-        const code = select.value;
-        const label = this.i18n.getCountryName(code);
-        const normalized = code?.toLowerCase() === 'uk' ? 'gb' : (code || '').toLowerCase();
-        const flag = this.i18n.flags[normalized] || this.i18n.flagFromCountryCode(normalized) || '';
-        btn.innerHTML = `<span class="text-base">${flag}</span><span>${label}</span><svg class=\"-mr-1 h-4 w-4 text-gray-500\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z\" clip-rule=\"evenodd\"/></svg>`;
-        this.renderTwemoji(container);
     }
 
     // Render emojis as SVGs via Twemoji for cross-platform consistency
@@ -567,7 +532,7 @@ class AmazonScraper {
                 select.dispatchEvent(new Event('change', { bubbles: true }));
                 // Update button label
                 const found = opts.find(o => o.code === val);
-                if (found) btn.innerHTML = `<span class="text-base">${found.flag}</span><span>${found.label}</span><svg class=\"-mr-1 h-4 w-4 text-gray-500\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z\" clip-rule=\"evenodd\"/></svg>`;
+                if (found) btn.innerHTML = `<span class="text-base">${found.flag}</span><span>${found.label}</span><svg class=\"-mr-1 h-4 w-4 text-gray-500\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z\" clip-rule=\"evenodd\"/></svg>`;
                 close();
             });
         });

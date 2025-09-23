@@ -104,6 +104,17 @@
     @apply font-semibold text-amazon-blue;
   }
 
+/* Comparison view grid */
+.comparison-grid-1 {
+    @apply grid grid-cols-1 gap-4;
+}
+.comparison-grid-2 {
+    @apply grid grid-cols-2 gap-4;
+}
+.comparison-grid-3 {
+    @apply grid grid-cols-3 gap-4;
+}
+
   /* Reusable Amazon-inspired components */
   .btn-amazon {
     @apply bg-gradient-to-r from-amazon-orange to-orange-500 
