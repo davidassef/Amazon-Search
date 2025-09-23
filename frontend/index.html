@@ -66,29 +66,29 @@
                     </button>
 
                     <!-- Country/Region selector with flag (to the right of search button) -->
-                    <div class="flex items-center gap-2">
-                        <label for="country-select" class="sr-only" data-i18n="country">Country/Region</label>
-                        <select id="country-select" class="form-select min-w-[160px]">
-                            <option value="us">🇺🇸 United States</option>
-                            <option value="ca">🇨🇦 Canada</option>
-                            <option value="uk">🇬🇧 United Kingdom</option>
-                            <option value="de">🇩🇪 Germany</option>
-                            <option value="fr">🇫🇷 France</option>
-                            <option value="es">🇪🇸 Spain</option>
-                            <option value="it">🇮🇹 Italy</option>
-                            <option value="jp">🇯🇵 Japan</option>
-                            <option value="au">🇦🇺 Australia</option>
-                            <option value="in">🇮🇳 India</option>
-                            <option value="br">🇧🇷 Brazil</option>
-                            <option value="mx">🇲🇽 Mexico</option>
-                        </select>
-                        <!-- Custom country dropdown container (progressive enhancement) -->
-                        <div id="country-custom" class="relative hidden md:block"></div>
+                    <div class="relative" id="country-multiselect">
+                        <button type="button" id="country-multiselect-button" class="form-select min-w-[160px] text-left">
+                            <span data-i18n="selectRegions">Select Regions</span>
+                        </button>
+                        <div id="country-multiselect-dropdown" class="hidden absolute z-10 w-full bg-white rounded-md shadow-lg">
+                            <ul class="max-h-60 overflow-auto">
+                                <!-- Options will be dynamically inserted here -->
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="flex items-center justify-center mt-4 text-sm text-gray-500">
-                    <span data-i18n="searchInfo">Press Enter to search quickly</span>
+                <div class="flex items-center justify-center mt-4 text-sm text-gray-500 hidden" id="comparison-options">
+                     <div class="flex items-center">
+                        <input id="convert-currency-checkbox" type="checkbox" class="h-4 w-4 text-amazon-orange focus:ring-amazon-orange border-gray-300 rounded">
+                        <label for="convert-currency-checkbox" class="ml-2 block text-sm text-gray-700" data-i18n="convertCurrency">Convert to</label>
+                        <select id="currency-select" class="ml-2 form-select text-sm">
+                            <option value="BRL">BRL</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="JPY">JPY</option>
+                        </select>
+                    </div>
                 </div>
             </form>
         </section>
@@ -205,6 +205,9 @@
 
             <div id="results-grid" class="results-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 <!-- Product cards will be inserted here -->
+            </div>
+            <div id="comparison-results-grid" class="hidden">
+                <!-- Comparison results will be inserted here -->
             </div>
         </section>
 
