@@ -164,6 +164,13 @@ class AmazonScraper {
             // Create abort controller for this search
             this.currentSearchController = new AbortController();
             
+            // Check backend health first
+            this.updateLoadingMessage('Checking backend availability...');
+            const healthCheck = await this.api.checkHealth();
+            if (!healthCheck.available) {
+                throw new Error(`Backend server is not running. Please start the backend server first.\n\nTip: Run both servers using the start-dev.sh script or start them separately:\n- Backend: cd backend && npm start\n- Frontend: cd frontend && npm run dev`);
+            }
+            
             // Update loading messages
             this.updateLoadingStatus();
             
