@@ -261,12 +261,13 @@ async function scrapeAmazonProducts(keyword, domain = 'amazon.com', retryCount =
         let price = 'N/A';
         const priceSelectors = [
           '.a-price .a-offscreen',
+          '#corePrice_feature_div span.a-offscreen', // More specific
+          '#priceblock_ourprice', // Common selector for main price
           '.a-price-whole',
-          '.a-price .a-offscreen',
           '[data-a-price] .a-offscreen',
-          '.a-price-symbol + .a-price-whole',
           '.a-text-price .a-offscreen',
-          '.a-color-price .a-offscreen'
+          '#price .a-text-strike', // For items on sale
+          '.a-color-price', // Broader fallback
         ];
         
         for (const selector of priceSelectors) {

@@ -393,18 +393,18 @@ class AmazonScraper {
         if (!dropdown || !button) return;
 
         const countries = [
-            { code: 'us', name: 'United States' },
-            { code: 'ca', name: 'Canada' },
-            { code: 'uk', name: 'United Kingdom' },
-            { code: 'de', name: 'Germany' },
-            { code: 'fr', name: 'France' },
-            { code: 'es', name: 'Spain' },
-            { code: 'it', name: 'Italy' },
-            { code: 'jp', name: 'Japan' },
-            { code: 'au', name: 'Australia' },
-            { code: 'in', name: 'India' },
-            { code: 'br', name: 'Brazil' },
-            { code: 'mx', name: 'Mexico' },
+            { code: 'us', name: 'United States', flag: '🇺🇸' },
+            { code: 'ca', name: 'Canada', flag: '🇨🇦' },
+            { code: 'uk', name: 'United Kingdom', flag: '🇬🇧' },
+            { code: 'de', name: 'Germany', flag: '🇩🇪' },
+            { code: 'fr', name: 'France', flag: '🇫🇷' },
+            { code: 'es', name: 'Spain', flag: '🇪🇸' },
+            { code: 'it', name: 'Italy', flag: '🇮🇹' },
+            { code: 'jp', name: 'Japan', flag: '🇯🇵' },
+            { code: 'au', name: 'Australia', flag: '🇦🇺' },
+            { code: 'in', name: 'India', flag: '🇮🇳' },
+            { code: 'br', name: 'Brazil', flag: '🇧🇷' },
+            { code: 'mx', name: 'Mexico', flag: '🇲🇽' },
         ];
 
         const list = dropdown.querySelector('ul');
@@ -412,7 +412,7 @@ class AmazonScraper {
             <li>
                 <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                     <input type="checkbox" value="${country.code}" class="form-checkbox h-4 w-4 text-amazon-orange focus:ring-amazon-orange border-gray-300 rounded">
-                    <span class="ml-3 text-sm text-gray-700">${country.name}</span>
+                    <span class="ml-3 text-sm text-gray-700">${country.flag} ${country.name}</span>
                 </label>
             </li>
         `).join('');
