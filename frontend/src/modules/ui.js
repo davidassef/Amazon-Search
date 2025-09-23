@@ -137,14 +137,25 @@ export class UI {
   }
 
   normalizeTitle(title) {
-    // Basic normalization: lowercase, remove special characters and common words
-    return title.toLowerCase()
-        .replace(/[^a-z0-9\s]/g, '')
-        .replace(/\b(for|with|and|the|a|an)\b/g, '')
-        .trim()
-        .split(/\s+/)
-        .slice(0, 8) // Use first 8 words for matching
-        .join(' ');
+    // Multi-language normalization: lowercase, remove special characters and common stop words
+    const stopWords = {
+      en: ['for', 'with', 'and', 'the', 'a', 'an'],
+      de: ['der', 'die', 'das', 'und', 'mit', 'ein', 'eine'],
+      es: ['el', 'la', 'los', 'las', 'y', 'con', 'un', 'una'],
+      fr: ['le', 'la', 'les', 'et', 'avec', 'un', 'une'],
+      it: ['il', 'lo', 'la', 'i', 'gli', 'le', 'e', 'con', 'un', 'una'],
+      // Add more languages as needed
+    };
+    // Determine language, fallback to 'en'
+    const lang = (this.i18n && this.i18n.language) ? this.i18n.language.split('-')[0] : 'en';
+    const words = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\u00C0-\u017F\s]/g, '') // allow accented chars for EU languages
+      .trim()
+      .split(/\s+/)
+      .filter(word => !((stopWords[lang] || stopWords['en']).includes(word)))
+      .slice(0, 8); // Use first 8 words for matching
+    return words.join(' ');
   }
 
   renderProductCard(product) {
