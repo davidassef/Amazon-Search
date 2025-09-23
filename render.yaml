@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: amazon-scraper-backend
+    env: docker
+    repo: https://github.com/davidassef/Amazon-Search.git # Replace with your repo URL
+    region: oregon
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 3000
+    autoDeploy: true

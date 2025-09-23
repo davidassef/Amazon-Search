@@ -299,6 +299,26 @@ See [Testing Documentation](docs/testing/testing-overview.md) for detailed testi
 
 MIT License - see LICENSE file for details
 
+## 🚀 Deployment
+
+### Backend on Render
+
+The backend is configured for deployment on Render using the provided `render.yaml` file.
+
+1.  Create a new "Blueprint Instance" on Render.
+2.  Connect your repository.
+3.  Render will automatically detect and use the `render.yaml` file.
+4.  The backend will be deployed at a URL like `https://your-app-name.onrender.com`.
+
+### Frontend on Vercel
+
+The frontend can be deployed on Vercel.
+
+1.  Create a new project on Vercel and connect your repository.
+2.  Set the root directory to `frontend`.
+3.  Vercel will automatically detect the Vite configuration and build the project.
+4.  The `vercel.json` file in the `frontend` directory is configured to proxy API requests to the Render backend. Make sure the `destination` URL in `frontend/vercel.json` matches your Render backend URL.
+
 ## 🤝 Contributing
 
 1. Fork the repository
