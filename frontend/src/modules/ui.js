@@ -106,7 +106,7 @@ export class UI {
             if (product) {
                 tableHTML += this.renderProductCard(product);
             } else {
-                tableHTML += `<div class="product-card bg-gray-50 flex items-center justify-center text-gray-400">Not found</div>`;
+                tableHTML += `<div class="product-card bg-gray-50 flex items-center justify-center text-gray-400">${this.i18n.t('productNotFound')}</div>`;
             }
         });
         tableHTML += `</div>`;
