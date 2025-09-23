@@ -59,6 +59,7 @@
   "noResults": "No products found matching your filters.",
   "resetFilters": "Reset Filters",
   "anyRating": "Any Rating",
-  "removeFilter": "Remove filter"
+  "removeFilter": "Remove filter",
+  "convertCurrency": "Convert to"
 }
 

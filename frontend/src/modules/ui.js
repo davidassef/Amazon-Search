@@ -100,15 +100,18 @@ export class UI {
     // Create a flex container for the columns
     let columnsHTML = '<div class="flex flex-col md:flex-row gap-6">';
 
-    domains.forEach(domain => {
+    domains.forEach((domain, index) => {
       const result = data.results[domain];
       const products = result.products || [];
 
+      // Add a separator for all columns except the first one
+      const separatorClass = index > 0 ? 'md:border-l md:border-gray-200 md:pl-6' : '';
+
       // Start column
-      columnsHTML += '<div class="flex-1 min-w-0">';
+      columnsHTML += `<div class="flex-1 min-w-0 ${separatorClass}">`;
 
       // Column Header
-      columnsHTML += `<h3 class="text-xl font-bold text-center mb-4">${domain}</h3>`;
+      columnsHTML += `<h3 class="text-lg font-bold text-center mb-4 p-2 bg-gray-100 rounded-t-lg">${domain}</h3>`;
 
       // Products Grid for this column
       columnsHTML += '<div class="grid grid-cols-1 gap-6">';

@@ -417,6 +417,8 @@ class AmazonScraper {
             </li>
         `).join('');
 
+        this.renderTwemoji(list);
+
         list.addEventListener('change', (e) => {
             if (e.target.type === 'checkbox') {
                 const selected = Array.from(list.querySelectorAll('input:checked')).map(input => input.value);
