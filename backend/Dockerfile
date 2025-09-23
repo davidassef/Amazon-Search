@@ -1,14 +1,14 @@
-# Use an official Bun runtime as a parent image
-FROM oven/bun:1-slim
+# Use an official Node.js runtime as a parent image
+FROM node:18-slim
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and bun.lock files
-COPY package.json bun.lock ./
+# Copy package.json and package-lock.json files
+COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN bun install --frozen-lockfile --production
+RUN npm ci --only=production
 
 # Copy the rest of the application code
 COPY . .
@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Define the command to run the application
-CMD ["bun", "start"]
+CMD ["npm", "start"]
