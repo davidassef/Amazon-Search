@@ -1,0 +1,99 @@
+# Copilot Instructions for Amazon-Search Project
+
+## Project Overview
+This is a full-stack Amazon product search application built with Bun, Express.js backend, and Vite frontend.
+
+## Architecture
+- **Backend**: Express.js with Bun runtime (port 3000)
+- **Frontend**: Vite + vanilla JS (port 5173) 
+- **Deployment**: Docker containers with multi-stage builds
+
+## Code Style & Patterns
+- Use modern ES6+ JavaScript syntax
+- Prefer async/await over promises
+- Follow RESTful API patterns for backend routes
+- Use descriptive variable and function names
+- Keep functions small and focused on single responsibility
+
+## Development Guidelines
+
+### Dependencies
+- Use Bun as the primary runtime and package manager
+- Backend runs with Node.js compatibility (Express.js)
+- Frontend builds with Bun and uses Vite
+- Minimize external dependencies
+- Pin dependency versions in package.json
+- Always update lockfiles when adding/removing packages
+
+### Docker & Deployment
+- Use `oven/bun:1-slim` base images for compatibility with current lockfiles
+- Use multi-stage builds for frontend (build + nginx)
+- Prefer `bun install --frozen-lockfile --production` for backend production builds
+- Use `bun install --frozen-lockfile` for frontend builds  
+- Working directory should be `/app` for consistency with docs
+- Always copy package.json and lockfiles before source code for better caching
+
+### Server Runtime
+- Backend uses Express.js with Node.js compatibility in Bun
+- Start command: `bun start` (which runs `node server.js`)
+- Development: `bun dev` (runs `node --watch server.js`)
+- Direct `bun server.js` won't work - Express needs Node.js compatibility mode
+
+### Error Handling
+- Always handle async errors with try/catch
+- Provide meaningful error messages
+- Use appropriate HTTP status codes in API responses
+- Log errors for debugging but don't expose internal details to clients
+
+### Testing
+- Use Bun's built-in test runner
+- Test files should end with `.test.js`
+- Focus on testing API endpoints and core business logic
+- Use supertest for API testing
+
+### File Organization
+```
+backend/
+├── server.js          # Main server entry point
+├── package.json       # Dependencies and scripts
+├── bun.lock          # Lockfile
+└── tests/            # Test files
+
+frontend/
+├── index.html        # Main HTML entry
+├── main.js          # Application entry point
+├── package.json     # Dependencies and scripts
+├── bun.lock        # Lockfile
+└── dist/           # Build output (ignored)
+```
+
+## Common Issues & Solutions
+
+### Docker Build Failures
+- **Lockfile issues**: Ensure lockfiles are compatible with Docker Bun version
+- **SSL certificates**: Use `--trust` flag or avoid `--frozen-lockfile` in development
+- **Network issues**: Consider using `--production` flag to reduce dependencies
+
+### Development Environment
+- Use `bun dev` or `bun --watch` for auto-reload during development
+- Frontend dev server runs on port 5173, backend on 3000
+- Ensure both services are running for full-stack development
+
+### Dependencies
+- Bun version compatibility: Use consistent Bun versions between local and Docker
+- Lock file format: Bun uses JSON format (.lock) vs npm binary format
+- Always test Docker builds after dependency changes
+
+## Best Practices
+1. **Always test Docker builds** after making changes to Dockerfiles or dependencies
+2. **Use consistent Bun versions** across development and production environments  
+3. **Keep Dockerfiles simple** and follow the patterns in the documentation
+4. **Update documentation** when making architectural changes
+5. **Commit lockfile changes** along with package.json updates
+6. **Use meaningful commit messages** that describe the change clearly
+
+## Debugging Tips
+- Check Bun version compatibility between local and Docker environments
+- Verify lockfile integrity with `bun install --lockfile-only`
+- Use `docker build --no-cache` to force fresh builds when debugging
+- Check network connectivity issues if packages fail to download in Docker
