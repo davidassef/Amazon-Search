@@ -416,7 +416,7 @@ class AmazonScraper {
                 const selected = Array.from(list.querySelectorAll('input:checked')).map(input => input.value);
                 if (selected.length > 3) {
                     e.target.checked = false;
-                    this.showNotification('You can select up to 3 regions.');
+                    this.showNotification(this.i18n.t('maxRegionsError', { max: 3 }));
                     return;
                 }
                 this.selectedCountries = selected;
