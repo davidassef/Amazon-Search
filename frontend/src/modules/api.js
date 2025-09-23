@@ -22,12 +22,8 @@ const uid = () => {
   return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
 };
 export class API {
-  constructor(baseURL = undefined) {
-    // Allow configuration via environment variable with fallback to '/api'
-    const envBase = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL
-      ? import.meta.env.VITE_API_BASE_URL
-      : undefined;
-    this.baseURL = baseURL || envBase || '/api';
+  constructor() {
+    this.baseURL = '/api';
     this.COUNTRY_TO_DOMAIN = {
       us: 'amazon.com',
       ca: 'amazon.ca',
@@ -44,11 +40,14 @@ export class API {
     };
   }
 
-  async searchProducts(keyword, country = 'us', { signal, onProgress } = {}) {
-    // Map country code to backend domain
-    const domain = this.COUNTRY_TO_DOMAIN[country] || this.COUNTRY_TO_DOMAIN.us;
+  async searchProducts(keyword, countries = ['us'], convertTo = null, { signal, onProgress } = {}) {
+    // Map country codes to backend domains
+    const domains = countries.map(country => this.COUNTRY_TO_DOMAIN[country] || this.COUNTRY_TO_DOMAIN.us).join(',');
 
-    const params = new URLSearchParams({ keyword, domain });
+    const params = new URLSearchParams({ keyword, domains });
+    if (convertTo) {
+      params.append('convertTo', convertTo);
+    }
     const url = `${this.baseURL}/scrape?${params.toString()}`;
 
     // Notify progress
@@ -71,7 +70,7 @@ export class API {
 
     const data = await response.json();
 
-    // Backend returns { success, products, ... }
+    // Backend returns { success, results: { domain: { products, ... } } }
     if (data && data.success === false) {
       throw new Error(data.error || 'API_ERROR');
     }
@@ -116,8 +115,19 @@ export class API {
       return null;
     };
 
-    // Normalize response shape
-    const products = (data.products || []).map((item) => {
+    // Normalize response shape for both single and multi-domain responses
+    if (data.results) { // Multi-domain response
+        for (const domain in data.results) {
+            data.results[domain].products = (data.results[domain].products || []).map(item => this.normalizeProduct(item));
+        }
+    } else { // Fallback for single domain response
+        data.products = (data.products || []).map(item => this.normalizeProduct(item));
+    }
+
+    return data;
+  }
+
+  normalizeProduct(item) {
       // Normalize values from backend keys
       const title = item.title || item.name || '';
       const url = item.url || item.productUrl || item.link || '#';
@@ -127,8 +137,10 @@ export class API {
       const priceRaw = item.price ?? item.priceText ?? null;
       const price = priceRaw && priceRaw !== 'N/A' ? priceRaw : null;
 
+      const convertedPrice = item.convertedPrice ?? null;
+
       // Normalize rating a partir de múltiplas chaves
-      const rating = extractRating(item);
+      const rating = this.extractRating(item);
 
       // Normalize reviews to integer
       let reviews = 0;
@@ -144,17 +156,44 @@ export class API {
         url,
         image,
         price,
+        convertedPrice,
         rating,
         reviews,
       };
-    });
+  }
 
-    // Não lançar erro se não houver produtos; permitir UI mostrar "sem resultados"
-    if (!products.length) {
-      return { products: [], total: 0 };
+  extractRating(item) {
+    const keys = [
+      'rating',
+      'ratingText',
+      'stars',
+      'starsText',
+      'averageRating',
+      'avgRating',
+      'rating_value',
+      'ratingValue',
+      'ratingOutOf5',
+      'score'
+    ];
+    for (const k of keys) {
+      if (k in item && item[k] != null && item[k] !== 'N/A') {
+        const v = item[k];
+        if (typeof v === 'number') {
+          const n = Math.max(0, Math.min(5, v));
+          return Number.isFinite(n) ? n : null;
+        }
+        const str = String(v).trim();
+        const m = str.match(/\d+[\.,]?\d*/);
+        if (m) {
+          const n = parseFloat(m[0].replace(',', '.'));
+          if (!Number.isNaN(n)) {
+            const clamped = Math.max(0, Math.min(5, n));
+            return clamped;
+          }
+        }
+      }
     }
-
-    return { products, total: products.length };
+    return null;
   }
 }
 

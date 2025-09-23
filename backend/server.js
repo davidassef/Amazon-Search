@@ -33,11 +33,32 @@ const AMAZON_DOMAINS = {
   'amazon.com.au': { baseUrl: 'https://www.amazon.com.au', language: 'en-AU,en;q=0.9' },
   'amazon.co.jp': { baseUrl: 'https://www.amazon.co.jp', language: 'ja-JP,ja;q=0.9,en;q=0.8' },
   'amazon.in': { baseUrl: 'https://www.amazon.in', language: 'en-IN,en;q=0.9,hi;q=0.8' },
-  'amazon.com.br': { baseUrl: 'https://www.amazon.com.br', language: 'pt-BR,pt;q=0.9,en;q=0.8' },
-  'amazon.com.mx': { baseUrl: 'https://www.amazon.com.mx', language: 'es-MX,es;q=0.9,en;q=0.8' },
-  'amazon.it': { baseUrl: 'https://www.amazon.it', language: 'it-IT,it;q=0.9,en;q=0.8' },
-  'amazon.es': { baseUrl: 'https://www.amazon.es', language: 'es-ES,es;q=0.9,en;q=0.8' }
+  'amazon.com.br': { baseUrl: 'https://www.amazon.com.br', language: 'pt-BR,pt;q=0.9,en;q=0.8', currency: 'BRL' },
+  'amazon.com.mx': { baseUrl: 'https://www.amazon.com.mx', language: 'es-MX,es;q=0.9,en;q=0.8', currency: 'MXN' },
+  'amazon.it': { baseUrl: 'https://www.amazon.it', language: 'it-IT,it;q=0.9,en;q=0.8', currency: 'EUR' },
+  'amazon.es': { baseUrl: 'https://www.amazon.es', language: 'es-ES,es;q=0.9,en;q=0.8', currency: 'EUR' }
 };
+
+// --- Currency Conversion ---
+const getExchangeRates = async (baseCurrency = 'USD') => {
+  try {
+    const response = await axios.get(`https://api.exchangerate.host/latest?base=${baseCurrency}`);
+    return response.data.rates;
+  } catch (error) {
+    console.error('Error fetching exchange rates:', error.message);
+    return null;
+  }
+};
+
+const convertCurrency = (amount, fromCurrency, toCurrency, rates) => {
+  if (!rates || !rates[fromCurrency] || !rates[toCurrency]) {
+    return null; // Not enough data to convert
+  }
+  // Convert amount from 'fromCurrency' to base currency (USD), then to 'toCurrency'
+  const amountInBase = amount / rates[fromCurrency];
+  return amountInBase * rates[toCurrency];
+};
+
 
 /**
  * Scrapes Amazon search results for a given keyword and domain
@@ -314,55 +335,93 @@ async function scrapeAmazonProducts(keyword, domain = 'amazon.com', retryCount =
  */
 app.get('/api/scrape', async (req, res) => {
   try {
-    const { keyword, domain } = req.query;
-    
-    // Validate keyword parameter
+    const { keyword, domains, convertTo } = req.query;
+
     if (!keyword) {
-      return res.status(400).json({
-        success: false,
-        error: 'Keyword parameter is required'
-      });
+      return res.status(400).json({ success: false, error: 'Keyword parameter is required' });
     }
-    
     if (keyword.length < 2) {
+      return res.status(400).json({ success: false, error: 'Keyword must be at least 2 characters long' });
+    }
+
+    const domainList = (domains || 'amazon.com').split(',').map(d => d.trim());
+    const invalidDomains = domainList.filter(d => !AMAZON_DOMAINS[d]);
+    if (invalidDomains.length > 0) {
       return res.status(400).json({
         success: false,
-        error: 'Keyword must be at least 2 characters long'
+        error: `Unsupported domains: ${invalidDomains.join(', ')}. Supported: ${Object.keys(AMAZON_DOMAINS).join(', ')}`
       });
     }
-    
-    // Validate domain parameter
-    const amazonDomain = domain || 'amazon.com';
-    if (!AMAZON_DOMAINS[amazonDomain]) {
-      return res.status(400).json({
-        success: false,
-        error: `Unsupported Amazon domain: ${amazonDomain}. Supported domains: ${Object.keys(AMAZON_DOMAINS).join(', ')}`
-      });
+
+    console.log(`Scraping for "${keyword}" on [${domainList.join(', ')}]`);
+
+    // Scrape all domains in parallel
+    const scrapePromises = domainList.map(domain =>
+      scrapeAmazonProducts(keyword, domain).then(products => ({ domain, products }))
+    );
+    const resultsByDomain = await Promise.all(scrapePromises);
+
+    let rates = null;
+    if (convertTo) {
+      rates = await getExchangeRates('USD'); // Use USD as a stable base
     }
-    
-    console.log(`Scraping request for keyword: ${keyword} on ${amazonDomain}`);
-    
-    // Scrape Amazon products
-    const products = await scrapeAmazonProducts(keyword, amazonDomain);
-    
-    // Return successful response
-    res.json({
+
+    const responseData = {
       success: true,
       keyword,
-      domain: amazonDomain,
-      totalProducts: products.length,
-      products: products.slice(0, 20) // Limit to first 20 products
-    });
-    
+      domains: domainList,
+      results: {},
+      ratesTimestamp: rates ? new Date().toISOString() : null,
+    };
+
+    for (const result of resultsByDomain) {
+      const { domain, products } = result;
+      const originalCurrency = AMAZON_DOMAINS[domain].currency;
+
+      if (convertTo && rates) {
+        products.forEach(p => {
+          const priceMatch = p.price.match(/[\d,.]+/);
+          if (priceMatch) {
+            const amount = parseFloat(priceMatch[0].replace(/,/g, ''));
+            const convertedAmount = convertCurrency(amount, originalCurrency, convertTo.toUpperCase(), rates);
+            p.convertedPrice = convertedAmount ? `${convertTo.toUpperCase()} ${convertedAmount.toFixed(2)}` : 'N/A';
+            p.originalCurrency = originalCurrency;
+          }
+        });
+      }
+      responseData.results[domain] = {
+        totalProducts: products.length,
+        products: products.slice(0, 20),
+      };
+    }
+
+    res.json(responseData);
+
   } catch (error) {
     console.error('API Error:', error.message);
-    
-    // Return error response
     res.status(500).json({
       success: false,
       error: 'Failed to scrape Amazon products',
-      details: error.message
+      details: error.message,
     });
+  }
+});
+
+/**
+ * API endpoint to get latest exchange rates
+ * GET /api/rates
+ */
+app.get('/api/rates', async (req, res) => {
+  try {
+    const { base } = req.query;
+    const rates = await getExchangeRates(base);
+    if (rates) {
+      res.json({ success: true, ...rates });
+    } else {
+      res.status(500).json({ success: false, error: 'Failed to fetch exchange rates' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Server error fetching rates' });
   }
 });
 
@@ -384,7 +443,8 @@ app.get('/', (req, res) => {
   res.json({
     message: 'Amazon Product Scraper API',
     endpoints: {
-      scrape: '/api/scrape?keyword=<search-term>',
+      scrape: '/api/scrape?keyword=<search-term>&domains=<domains>&convertTo=<currency>',
+      rates: '/api/rates?base=<currency>',
       health: '/api/health'
     }
   });
