@@ -40,6 +40,19 @@ export class API {
     };
   }
 
+  async checkHealth() {
+    try {
+      const response = await fetch(`${this.baseURL}/health`);
+      if (response.ok) {
+        const data = await response.json();
+        return { available: true, message: data.message || 'Backend is running' };
+      }
+      return { available: false, message: `Backend returned ${response.status}` };
+    } catch (error) {
+      return { available: false, message: 'Backend is not running or unreachable' };
+    }
+  }
+
   async searchProducts(keyword, countries = ['us'], convertTo = null, { signal, onProgress } = {}) {
     // Map country codes to backend domains
     const domains = countries.map(country => this.COUNTRY_TO_DOMAIN[country] || this.COUNTRY_TO_DOMAIN.us).join(',');
@@ -61,6 +74,13 @@ export class API {
         const errData = await response.json();
         details = errData?.error || '';
       } catch {}
+
+      // Special handling for backend connectivity issues
+      if (response.status === 500 && !details) {
+        // This is likely a proxy error when backend is not running
+        throw new Error('BACKEND_UNAVAILABLE: The backend server is not running. Please start the backend server on port 3000.');
+      }
+
       const msg = details ? `HTTP_${response.status}: ${details}` : `HTTP_${response.status}`;
       throw new Error(msg);
     }
@@ -74,46 +94,6 @@ export class API {
     if (data && data.success === false) {
       throw new Error(data.error || 'API_ERROR');
     }
-
-    // Helper interno para extrair rating com robustez de múltiplas chaves
-    /**
-     * Extrai a avaliação (0-5) a partir de possíveis chaves do item do backend.
-     * Aceita number direto ou string em formatos "4,5", "4.5", "4.5 out of 5".
-     * Retorna null se não conseguir extrair número válido.
-     */
-    const extractRating = (item) => {
-      const keys = [
-        'rating',
-        'ratingText',
-        'stars',
-        'starsText',
-        'averageRating',
-        'avgRating',
-        'rating_value',
-        'ratingValue',
-        'ratingOutOf5',
-        'score'
-      ];
-      for (const k of keys) {
-        if (k in item && item[k] != null && item[k] !== 'N/A') {
-          const v = item[k];
-          if (typeof v === 'number') {
-            const n = Math.max(0, Math.min(5, v));
-            return Number.isFinite(n) ? n : null;
-          }
-          const str = String(v).trim();
-          const m = str.match(/\d+[\.,]?\d*/);
-          if (m) {
-            const n = parseFloat(m[0].replace(',', '.'));
-            if (!Number.isNaN(n)) {
-              const clamped = Math.max(0, Math.min(5, n));
-              return clamped;
-            }
-          }
-        }
-      }
-      return null;
-    };
 
     // Normalize response shape for both single and multi-domain responses
     if (data.results) { // Multi-domain response
@@ -196,4 +176,3 @@ export class API {
     return null;
   }
 }
-
