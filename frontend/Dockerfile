@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM oven/bun:1.0 AS build
+FROM oven/bun:1-alpine AS build
 
 # Set the working directory
 WORKDIR /usr/src/app

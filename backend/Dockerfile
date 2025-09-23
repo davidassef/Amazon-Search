@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a parent image
-FROM oven/bun:1.0
+FROM oven/bun:1-alpine
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
