@@ -54,15 +54,14 @@ export class UI {
 
     if (isComparison) {
         this.renderComparisonView(data);
-        document.getElementById('filter-toggle').classList.add('hidden');
-        document.getElementById('sort-by').classList.add('hidden');
     } else {
         const products = data.results ? Object.values(data.results)[0].products : [];
         this.currentResults = products;
         this.renderSingleGridView(products);
-        document.getElementById('filter-toggle').classList.remove('hidden');
-        document.getElementById('sort-by').classList.remove('hidden');
     }
+    // Always ensure filters are visible when results are shown
+    document.getElementById('filter-toggle').classList.remove('hidden');
+    document.getElementById('sort-by').classList.remove('hidden');
 
     // Show section
     resultsSection.classList.remove('hidden');
@@ -111,7 +110,7 @@ export class UI {
       columnsHTML += `<div class="flex-1 min-w-0 ${separatorClass}">`;
 
       // Column Header
-      columnsHTML += `<h3 class="text-lg font-bold text-center mb-4 p-2 bg-gray-100 rounded-t-lg">${domain}</h3>`;
+      columnsHTML += `<h3 class="text-lg font-bold text-center mb-4 p-2 bg-yellow-400 text-white rounded-t-lg" style="text-shadow: 1px 1px 1px #000;">${domain}</h3>`;
 
       // Products Grid for this column
       columnsHTML += '<div class="grid grid-cols-1 gap-6">';

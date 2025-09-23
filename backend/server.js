@@ -336,7 +336,7 @@ async function scrapeAmazonProducts(keyword, domain = 'amazon.com', retryCount =
  */
 app.get('/api/scrape', async (req, res) => {
   try {
-    const { keyword, domains, convertTo } = req.query;
+    const { keyword, domains, convert_currency: convertTo } = req.query;
 
     if (!keyword) {
       return res.status(400).json({ success: false, error: 'Keyword parameter is required' });
