@@ -54,14 +54,14 @@ export class UI {
 
     if (isComparison) {
         this.renderComparisonView(data);
-        document.getElementById('filter-toggle').classList.add('hidden');
-        document.getElementById('sort-by').classList.add('hidden');
+        document.getElementById('filter-toggle').style.display = 'none';
+        document.getElementById('sort-by').style.display = 'none';
     } else {
-        const products = (data.results && data.results[Object.keys(data.results)[0]]) ? data.results[Object.keys(data.results)[0]].products : [];
+        const products = (data.results && data.results[Object.keys(data.results)[0]]) ? data.results[Object.keys(data.results)[0]].products : (data.products || []);
         this.currentResults = products;
         this.renderSingleGridView(products);
-        document.getElementById('filter-toggle').classList.remove('hidden');
-        document.getElementById('sort-by').classList.remove('hidden');
+        document.getElementById('filter-toggle').style.display = '';
+        document.getElementById('sort-by').style.display = '';
     }
 
     // Show section

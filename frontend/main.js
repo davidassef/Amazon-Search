@@ -330,7 +330,7 @@ class AmazonScraper {
         // Apply filters to current results
         if (this.currentResults && this.currentResults.length > 0) {
             const filteredResults = this.filters.apply(this.currentResults);
-            this.ui.showResults(filteredResults, this.currentKeyword);
+            this.ui.renderSingleGridView(filteredResults);
         }
         
         // Hide filters panel on mobile

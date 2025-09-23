@@ -310,14 +310,24 @@ The backend is configured for deployment on Render using the provided `render.ya
 3.  Render will automatically detect and use the `render.yaml` file.
 4.  The backend will be deployed at a URL like `https://your-app-name.onrender.com`.
 
+### Running with Docker
+
+To run the entire application locally using Docker, ensure you have Docker and Docker Compose installed, then run:
+
+```bash
+docker compose up --build
+```
+The frontend will be available at `http://localhost`.
+
 ### Frontend on Vercel
 
 The frontend can be deployed on Vercel.
 
 1.  Create a new project on Vercel and connect your repository.
 2.  Set the root directory to `frontend`.
-3.  Vercel will automatically detect the Vite configuration and build the project.
-4.  The `vercel.json` file in the `frontend` directory is configured to proxy API requests to the Render backend. Make sure the `destination` URL in `frontend/vercel.json` matches your Render backend URL.
+3.  Set the following environment variable in your Vercel project settings:
+    *   `BACKEND_URL`: The URL of your deployed Render backend (e.g., `https://your-app-name.onrender.com`).
+4.  Vercel will automatically detect the Vite configuration and build the project. The `vercel.json` file is configured to use the `BACKEND_URL` environment variable to proxy API requests.
 
 ## 🤝 Contributing
 
