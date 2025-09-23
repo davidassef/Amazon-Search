@@ -1,8 +1,8 @@
 # Stage 1: Build the application
-FROM oven/bun:1.0 AS build
+FROM oven/bun:1-slim AS build
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and bun.lock
 COPY package.json bun.lock ./
@@ -20,7 +20,7 @@ RUN bun run build
 FROM nginx:stable-alpine
 
 # Copy the built assets from the build stage
-COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy the nginx configuration file
 COPY nginx.conf /etc/nginx/conf.d/default.conf

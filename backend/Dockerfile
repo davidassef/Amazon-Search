@@ -1,14 +1,14 @@
-# Use an official Node.js runtime as a parent image
-FROM oven/bun:1.0
+# Use an official Bun runtime as a parent image
+FROM oven/bun:1-slim
 
 # Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and bun.lock files
 COPY package.json bun.lock ./
 
 # Install dependencies
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile --production
 
 # Copy the rest of the application code
 COPY . .
