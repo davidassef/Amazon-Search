@@ -383,9 +383,15 @@ app.get('/api/scrape', async (req, res) => {
           const priceMatch = p.price.match(/[\d,.]+/);
           if (priceMatch) {
             const amount = parseFloat(priceMatch[0].replace(/,/g, ''));
-            const convertedAmount = convertCurrency(amount, originalCurrency, convertTo.toUpperCase(), rates);
-            p.convertedPrice = convertedAmount ? `${convertTo.toUpperCase()} ${convertedAmount.toFixed(2)}` : 'N/A';
-            p.originalCurrency = originalCurrency;
+            if (originalCurrency) {
+              const convertedAmount = convertCurrency(amount, originalCurrency, convertTo.toUpperCase(), rates);
+              p.convertedPrice = convertedAmount ? `${convertTo.toUpperCase()} ${convertedAmount.toFixed(2)}` : 'N/A';
+              p.originalCurrency = originalCurrency;
+            } else {
+              p.convertedPrice = 'N/A';
+              p.originalCurrency = null;
+              p.currencyConversionNote = 'Currency not defined for this domain; conversion unavailable.';
+            }
           }
         });
       }
