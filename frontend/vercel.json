@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://amazon-scraper-backend.onrender.com/api/:path*"
+      "destination": "https://amazon-search-dc1h.onrender.com/api/:path*"
     }
   ]
 }
