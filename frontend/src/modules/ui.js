@@ -115,7 +115,7 @@ export class UI {
     tableHTML += `</div>`;
     comparisonGrid.innerHTML = tableHTML;
 
-    resultsCount.textContent = `Comparing ${matchedProducts.length} matched products for "${this.currentKeyword}"`;
+    resultsCount.textContent = this.i18n.t('comparingProducts', { count: matchedProducts.length, keyword: this.currentKeyword });
     resultsKeyword.textContent = '';
   }
 
