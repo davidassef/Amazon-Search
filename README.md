@@ -67,6 +67,12 @@ A full-stack application to scrape Amazon product listings from search results. 
 
 > 💡 **Quick Demo**: Click the preview images or links above to watch the full application in action, featuring real-time Amazon product search, responsive design, and multi-language support.
 
+## 🌐 Acesso à Produção
+
+Você pode acessar a versão ao vivo da aplicação aqui:
+
+**[https://amazon-search-six.vercel.app/](https://amazon-search-six.vercel.app/)**
+
 ## ✨ Features
 
 - **🔧 Backend API** (Bun + Express): Scrapes Amazon search results and returns product data as JSON

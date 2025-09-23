@@ -96,33 +96,39 @@ export class UI {
     comparisonGrid.classList.remove('hidden');
 
     const domains = Object.keys(data.results);
-    const gridClass = `comparison-grid-${domains.length}`;
-    const maxProducts = Math.max(...domains.map(d => data.results[d].products.length));
 
-    let tableHTML = `<div class="${gridClass}">`;
+    // Create a flex container for the columns
+    let columnsHTML = '<div class="flex flex-col md:flex-row gap-6">';
 
-    // Headers
     domains.forEach(domain => {
-        tableHTML += `<div class="font-bold text-lg text-center">${domain}</div>`;
+      const result = data.results[domain];
+      const products = result.products || [];
+
+      // Start column
+      columnsHTML += '<div class="flex-1 min-w-0">';
+
+      // Column Header
+      columnsHTML += `<h3 class="text-xl font-bold text-center mb-4">${domain}</h3>`;
+
+      // Products Grid for this column
+      columnsHTML += '<div class="grid grid-cols-1 gap-6">';
+      if (products.length > 0) {
+        columnsHTML += products.map(p => this.renderProductCard(p)).join('');
+      } else {
+        columnsHTML += `<p class="text-center text-gray-500">${this.i18n.t('noResults')}</p>`;
+      }
+      columnsHTML += '</div>'; // End products grid
+
+      columnsHTML += '</div>'; // End column
     });
 
-    // Body
-    for (let i = 0; i < maxProducts; i++) {
-        domains.forEach(domain => {
-            const product = data.results[domain].products[i];
-            if (product) {
-                tableHTML += this.renderProductCard(product);
-            } else {
-                tableHTML += `<div></div>`; // Empty cell
-            }
-        });
-    }
+    columnsHTML += '</div>'; // End flex container
 
-    tableHTML += `</div>`;
-    comparisonGrid.innerHTML = tableHTML;
+    comparisonGrid.innerHTML = columnsHTML;
 
-    resultsCount.textContent = `Comparing ${this.currentKeyword}`;
-    resultsKeyword.textContent = '';
+    // Also update the main results header
+    if (resultsCount) resultsCount.textContent = this.i18n.t('comparisonTitleWithKeyword', { keyword: this.currentKeyword });
+    if (resultsKeyword) resultsKeyword.textContent = ''; // This span is no longer needed
   }
 
   renderProductCard(product) {
