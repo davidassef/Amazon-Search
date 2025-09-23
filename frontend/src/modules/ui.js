@@ -43,45 +43,25 @@ export class UI {
   }
 
   // Results rendering
-  showResults(products, keyword) {
+  showResults(data, keyword, isComparison) {
     this.hideLoading();
     this.hideError();
 
     const resultsSection = document.getElementById('results-section');
-    const resultsGrid = document.getElementById('results-grid');
-    const resultsCount = document.getElementById('results-count');
-    const resultsKeyword = document.getElementById('results-keyword');
-    const noResults = document.getElementById('no-results');
-    const filtersSummary = document.getElementById('filters-summary');
+    if (!resultsSection) return;
 
-    if (!resultsSection || !resultsGrid) return;
-
-    // Store current results and keyword
-    this.currentResults = Array.isArray(products) ? [...products] : [];
     this.currentKeyword = keyword || '';
 
-    // Update header info
-    const hasResults = products.length > 0;
-    resultsCount.textContent = this.i18n.t('resultsCount', { count: products.length });
-    resultsKeyword.textContent = ` ${this.i18n.t('resultsKeyword', { keyword })}`;
-    
-    // Toggle no results message
-    if (noResults) {
-      noResults.classList.toggle('hidden', hasResults);
-    }
-    
-    // Toggle filters summary
-    if (filtersSummary) {
-      filtersSummary.classList.toggle('hidden', !hasResults);
-    }
-
-    // Render product cards or no results message
-    if (hasResults) {
-      resultsGrid.innerHTML = products.map((p) => this.renderProductCard(p)).join('');
-      resultsGrid.classList.remove('hidden');
+    if (isComparison) {
+        this.renderComparisonView(data);
+        document.getElementById('filter-toggle').classList.add('hidden');
+        document.getElementById('sort-by').classList.add('hidden');
     } else {
-      resultsGrid.innerHTML = '';
-      resultsGrid.classList.add('hidden');
+        const products = data.results ? Object.values(data.results)[0].products : [];
+        this.currentResults = products;
+        this.renderSingleGridView(products);
+        document.getElementById('filter-toggle').classList.remove('hidden');
+        document.getElementById('sort-by').classList.remove('hidden');
     }
 
     // Show section
@@ -92,10 +72,69 @@ export class UI {
     this.updateFiltersSummary();
   }
 
+  renderSingleGridView(products) {
+    const resultsGrid = document.getElementById('results-grid');
+    const comparisonGrid = document.getElementById('comparison-results-grid');
+    const resultsCount = document.getElementById('results-count');
+    const resultsKeyword = document.getElementById('results-keyword');
+
+    resultsGrid.innerHTML = products.map((p) => this.renderProductCard(p)).join('');
+    resultsGrid.classList.remove('hidden');
+    comparisonGrid.classList.add('hidden');
+
+    resultsCount.textContent = this.i18n.t('resultsCount', { count: products.length });
+    resultsKeyword.textContent = ` ${this.i18n.t('resultsKeyword', { keyword: this.currentKeyword })}`;
+  }
+
+  renderComparisonView(data) {
+    const resultsGrid = document.getElementById('results-grid');
+    const comparisonGrid = document.getElementById('comparison-results-grid');
+    const resultsCount = document.getElementById('results-count');
+    const resultsKeyword = document.getElementById('results-keyword');
+
+    resultsGrid.classList.add('hidden');
+    comparisonGrid.classList.remove('hidden');
+
+    const domains = Object.keys(data.results);
+    const gridClass = `comparison-grid-${domains.length}`;
+    const maxProducts = Math.max(...domains.map(d => data.results[d].products.length));
+
+    let tableHTML = `<div class="${gridClass}">`;
+
+    // Headers
+    domains.forEach(domain => {
+        tableHTML += `<div class="font-bold text-lg text-center">${domain}</div>`;
+    });
+
+    // Body
+    for (let i = 0; i < maxProducts; i++) {
+        domains.forEach(domain => {
+            const product = data.results[domain].products[i];
+            if (product) {
+                tableHTML += this.renderProductCard(product);
+            } else {
+                tableHTML += `<div></div>`; // Empty cell
+            }
+        });
+    }
+
+    tableHTML += `</div>`;
+    comparisonGrid.innerHTML = tableHTML;
+
+    resultsCount.textContent = `Comparing ${this.currentKeyword}`;
+    resultsKeyword.textContent = '';
+  }
+
   renderProductCard(product) {
     const ratingStars = this.renderStars(product.rating || 0);
     const reviewsText = this.formatReviews(product.reviews || 0);
-    const priceText = product.price || this.i18n.t('priceNotAvailable');
+
+    let priceHTML = '';
+    if (product.convertedPrice) {
+        priceHTML = `<div class="product-price">${product.convertedPrice}</div><div class="text-sm text-gray-500">${product.price}</div>`;
+    } else {
+        priceHTML = `<div class="product-price">${product.price || this.i18n.t('priceNotAvailable')}</div>`;
+    }
 
     return `
       <article class="product-card">
@@ -104,7 +143,7 @@ export class UI {
         </a>
         <div class="p-4">
           <h3 class="product-title">${product.title}</h3>
-          <div class="product-price">${priceText}</div>
+          ${priceHTML}
           <div class="product-rating">
             ${ratingStars}
             <span class="product-reviews">${reviewsText}</span>
