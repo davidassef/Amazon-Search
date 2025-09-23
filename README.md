@@ -125,8 +125,56 @@ A full-stack application to scrape Amazon product listings from search results. 
 
 ## 📋 Prerequisites
 
-- [Bun](https://bun.sh/) - JavaScript runtime and package manager
-- [Node.js](https://nodejs.org/) - For Vite frontend (optional, Bun can handle most tasks)
+- [Node.js](https://nodejs.org/) (v18 or higher) 
+- [Bun](https://bun.sh/) (optional but recommended for backend)
+
+## 🚀 Quick Start
+
+### Option 1: Automated Setup (Recommended)
+```bash
+git clone https://github.com/davidassef/Amazon-Search
+cd Amazon-Search
+./start-dev.sh
+```
+
+This script will:
+- ✅ Check port availability (3000 for backend, 5173 for frontend)
+- ✅ Install all dependencies automatically
+- ✅ Start both backend and frontend servers
+- ✅ Provide helpful status messages
+
+**Access the application:**
+- 🌐 **Frontend**: http://localhost:5173
+- 📡 **Backend API**: http://localhost:3000
+
+### Option 2: Manual Setup
+
+#### 1. Install Dependencies
+```bash
+# Backend dependencies
+cd backend && npm install
+
+# Frontend dependencies  
+cd ../frontend && npm install
+```
+
+#### 2. Start Backend Server
+```bash
+cd backend
+npm start        # Starts on port 3000
+```
+
+#### 3. Start Frontend Server (in a new terminal)
+```bash
+cd frontend
+npm run dev      # Starts on port 5173
+```
+
+### ⚠️ Important Notes
+
+- **Both servers must be running** for the application to work correctly
+- If you see "404 errors" when searching, make sure the backend server is running on port 3000
+- The frontend automatically proxies API requests to the backend via Vite configuration
 
 ## 🚀 Installation & Setup
 

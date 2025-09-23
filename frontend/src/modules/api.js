@@ -44,6 +44,19 @@ export class API {
     };
   }
 
+  async checkHealth() {
+    try {
+      const response = await fetch(`${this.baseURL}/health`);
+      if (response.ok) {
+        const data = await response.json();
+        return { available: true, message: data.message || 'Backend is running' };
+      }
+      return { available: false, message: `Backend returned ${response.status}` };
+    } catch (error) {
+      return { available: false, message: 'Backend is not running or unreachable' };
+    }
+  }
+
   async searchProducts(keyword, countries = ['us'], convertTo = null, { signal, onProgress } = {}) {
     // Map country codes to backend domains
     const domains = countries.map(country => this.COUNTRY_TO_DOMAIN[country] || this.COUNTRY_TO_DOMAIN.us).join(',');
@@ -65,6 +78,13 @@ export class API {
         const errData = await response.json();
         details = errData?.error || '';
       } catch {}
+      
+      // Special handling for backend connectivity issues
+      if (response.status === 500 && !details) {
+        // This is likely a proxy error when backend is not running
+        throw new Error('BACKEND_UNAVAILABLE: The backend server is not running. Please start the backend server on port 3000.');
+      }
+      
       const msg = details ? `HTTP_${response.status}: ${details}` : `HTTP_${response.status}`;
       throw new Error(msg);
     }
