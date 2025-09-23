@@ -397,7 +397,7 @@ cd frontend
 
 # Clear cache and reinstall
 rm -rf node_modules
-rm bun.lockb
+rm bun.lock
 bun install
 
 # Rebuild Tailwind CSS
@@ -410,7 +410,7 @@ cd backend
 
 # Clear and reinstall
 rm -rf node_modules
-rm bun.lockb
+rm bun.lock
 bun install
 
 # Test specific modules
@@ -440,11 +440,11 @@ FROM oven/bun:1
 WORKDIR /app
 
 # Copy backend
-COPY backend/package.json backend/bun.lockb ./backend/
+COPY backend/package.json backend/bun.lock ./backend/
 RUN cd backend && bun install
 
 # Copy frontend  
-COPY frontend/package.json frontend/bun.lockb ./frontend/
+COPY frontend/package.json frontend/bun.lock ./frontend/
 RUN cd frontend && bun install
 
 COPY . .

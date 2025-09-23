@@ -241,13 +241,13 @@ app.use((err, req, res, next) => {
 
 ```dockerfile
 # backend/Dockerfile
-FROM oven/bun:1-slim
+FROM oven/bun:1-alpine
 
 # Set working directory
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copy package files
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 
 # Install dependencies
 RUN bun install --frozen-lockfile --production
@@ -260,7 +260,7 @@ RUN addgroup -g 1001 -S nodejs
 RUN adduser -S bun -u 1001
 
 # Change ownership
-RUN chown -R bun:nodejs /app
+RUN chown -R bun:nodejs /usr/src/app
 USER bun
 
 # Expose port
@@ -278,12 +278,12 @@ CMD ["bun", "start"]
 
 ```dockerfile
 # frontend/Dockerfile
-FROM oven/bun:1-slim AS builder
+FROM oven/bun:1-alpine AS builder
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copy package files
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 # Copy source and build
@@ -294,7 +294,7 @@ RUN bun run build
 FROM nginx:alpine
 
 # Copy built assets
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -937,7 +937,7 @@ deploy_production:
 ```bash
 # Clear cache and rebuild
 cd frontend
-rm -rf node_modules bun.lockb
+rm -rf node_modules bun.lock
 bun install
 bun run build
 
