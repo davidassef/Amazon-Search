@@ -10,7 +10,7 @@
 
 **Description:** A full-stack web application for scraping Amazon product listings from search results, featuring a modern responsive interface and comprehensive API.
 
-**Last Updated:** August 2025
+**Last Updated:** September 2025
 
 ---
 
