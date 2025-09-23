@@ -19,16 +19,25 @@ This is a full-stack Amazon product search application built with Bun, Express.j
 
 ### Dependencies
 - Use Bun as the primary runtime and package manager
+- Backend runs with Node.js compatibility (Express.js)
+- Frontend builds with Bun and uses Vite
 - Minimize external dependencies
 - Pin dependency versions in package.json
 - Always update lockfiles when adding/removing packages
 
 ### Docker & Deployment
-- Use `oven/bun:1-slim` base images for compatibility
+- Use `oven/bun:1-slim` base images for compatibility with current lockfiles
 - Use multi-stage builds for frontend (build + nginx)
-- Prefer `bun install --production` for production builds
+- Prefer `bun install --frozen-lockfile --production` for backend production builds
+- Use `bun install --frozen-lockfile` for frontend builds  
 - Working directory should be `/app` for consistency with docs
 - Always copy package.json and lockfiles before source code for better caching
+
+### Server Runtime
+- Backend uses Express.js with Node.js compatibility in Bun
+- Start command: `bun start` (which runs `node server.js`)
+- Development: `bun dev` (runs `node --watch server.js`)
+- Direct `bun server.js` won't work - Express needs Node.js compatibility mode
 
 ### Error Handling
 - Always handle async errors with try/catch
