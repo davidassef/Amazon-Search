@@ -61,6 +61,11 @@
   "anyRating": "Any Rating",
   "removeFilter": "Remove filter",
   "convertCurrency": "Convert to",
-  "comparisonTitleWithKeyword": "Comparing results for \\"{{keyword}}\\""
+  "comparisonTitleWithKeyword": "Comparing results for \"{{keyword}}\"",
+  "pageTitle": "Amazon Product Scraper",
+  "metaDescription": "Search for products on Amazon and view the first page results",
+  "footerTech": "Built with Bun, Vite & Tailwind CSS",
+  "footerFeatures": "12 Countries • Real-time Data", 
+  "footerCopyright": "© 2025 • Educational purposes only"
 }
 
