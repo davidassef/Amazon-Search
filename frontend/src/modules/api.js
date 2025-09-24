@@ -162,6 +162,8 @@ export class API {
       const price = priceRaw && priceRaw !== 'N/A' ? priceRaw : null;
 
       const convertedPrice = item.convertedPrice ?? null;
+      const originalCurrency = item.originalCurrency ?? null;
+      const originalPrice = item.originalPrice ?? null;
 
       // Normalize rating a partir de múltiplas chaves
       const rating = this.extractRating(item);
@@ -181,6 +183,8 @@ export class API {
         image,
         price,
         convertedPrice,
+        originalCurrency,
+        originalPrice,
         rating,
         reviews,
       };
