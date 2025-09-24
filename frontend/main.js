@@ -244,7 +244,7 @@ class AmazonScraper {
         await this.i18n.setLanguage(language);
         this.storage.set('language', language);
         // Rebuild custom country labels to reflect new language
-        this.updateCustomCountryLabels();
+        this.buildCountryMultiSelect();
         // Rebuild custom language labels (localized names)
         this.updateCustomLanguageLabels();
     }
@@ -412,10 +412,12 @@ class AmazonScraper {
             <li>
                 <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                     <input type="checkbox" value="${country.code}" class="form-checkbox h-4 w-4 text-amazon-orange focus:ring-amazon-orange border-gray-300 rounded">
-                    <span class="ml-3 text-sm text-gray-700">${country.flag} ${country.name}</span>
+                    <span class="ml-3 text-sm text-gray-700">${country.flag} ${this.i18n.getCountryName(country.code)}</span>
                 </label>
             </li>
         `).join('');
+
+        this.renderTwemoji(list);
 
         list.addEventListener('change', (e) => {
             if (e.target.type === 'checkbox') {
