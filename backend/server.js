@@ -41,22 +41,79 @@ const AMAZON_DOMAINS = {
 
 // --- Currency Conversion ---
 const getExchangeRates = async (baseCurrency = 'USD') => {
-  try {
-    const response = await axios.get(`https://api.exchangerate.host/latest?base=${baseCurrency}`);
-    return response.data.rates;
-  } catch (error) {
-    console.error('Error fetching exchange rates:', error.message);
-    return null;
+  const APIs = [
+    // Primary API - exchangerate-api.com (free tier available)
+    `https://api.exchangerate-api.com/v4/latest/${baseCurrency}`,
+    // Backup API - fixer.io alternative (if first fails)
+    `https://open.er-api.com/v6/latest/${baseCurrency}`,
+  ];
+
+  for (let i = 0; i < APIs.length; i++) {
+    try {
+      const response = await axios.get(APIs[i], { timeout: 5000 });
+      
+      // Handle different response formats
+      if (response.data.rates) {
+        return {
+          rates: response.data.rates,
+          base: response.data.base || baseCurrency,
+          timestamp: response.data.date || response.data.time_last_update_unix || new Date().toISOString(),
+          lastUpdate: response.data.date || new Date().toISOString().split('T')[0]
+        };
+      }
+    } catch (error) {
+      console.error(`Error fetching exchange rates from API ${i + 1}:`, error.message);
+      // Continue to next API
+    }
   }
+
+  // If all APIs fail, return fallback rates for major currencies
+  console.warn('All exchange rate APIs failed, using fallback rates');
+  return getFallbackRates(baseCurrency);
 };
 
-const convertCurrency = (amount, fromCurrency, toCurrency, rates) => {
-  if (!rates || !rates[fromCurrency] || !rates[toCurrency]) {
+const getFallbackRates = (baseCurrency = 'USD') => {
+  // Static fallback rates (approximate values - should be updated periodically)
+  const fallbackRates = {
+    USD: { USD: 1, EUR: 0.85, GBP: 0.73, JPY: 110, CAD: 1.25, AUD: 1.35, BRL: 5.0, MXN: 17.5, INR: 74 },
+    EUR: { USD: 1.18, EUR: 1, GBP: 0.86, JPY: 130, CAD: 1.47, AUD: 1.59, BRL: 5.88, MXN: 20.6, INR: 87 },
+    GBP: { USD: 1.37, EUR: 1.16, GBP: 1, JPY: 151, CAD: 1.71, AUD: 1.85, BRL: 6.85, MXN: 24, INR: 101 }
+  };
+
+  return {
+    rates: fallbackRates[baseCurrency] || fallbackRates.USD,
+    base: baseCurrency,
+    timestamp: new Date().toISOString(),
+    lastUpdate: new Date().toISOString().split('T')[0],
+    isFallback: true
+  };
+};
+
+const convertCurrency = (amount, fromCurrency, toCurrency, rateData) => {
+  if (!rateData || !rateData.rates) {
     return null; // Not enough data to convert
   }
-  // Convert amount from 'fromCurrency' to base currency (USD), then to 'toCurrency'
-  const amountInBase = amount / rates[fromCurrency];
-  return amountInBase * rates[toCurrency];
+  
+  const rates = rateData.rates;
+  const baseCurrency = rateData.base || 'USD';
+  
+  // If converting from the base currency
+  if (fromCurrency === baseCurrency && rates[toCurrency]) {
+    return amount * rates[toCurrency];
+  }
+  
+  // If converting to the base currency
+  if (toCurrency === baseCurrency && rates[fromCurrency]) {
+    return amount / rates[fromCurrency];
+  }
+  
+  // If neither is the base currency, convert through base
+  if (rates[fromCurrency] && rates[toCurrency]) {
+    const amountInBase = amount / rates[fromCurrency];
+    return amountInBase * rates[toCurrency];
+  }
+  
+  return null; // Not enough data to convert
 };
 
 
@@ -336,7 +393,7 @@ async function scrapeAmazonProducts(keyword, domain = 'amazon.com', retryCount =
  */
 app.get('/api/scrape', async (req, res) => {
   try {
-    const { keyword, domains, convert_currency: convertTo } = req.query;
+    const { keyword, domains, convertTo } = req.query;
 
     if (!keyword) {
       return res.status(400).json({ success: false, error: 'Keyword parameter is required' });
@@ -362,9 +419,9 @@ app.get('/api/scrape', async (req, res) => {
     );
     const resultsByDomain = await Promise.all(scrapePromises);
 
-    let rates = null;
+    let rateData = null;
     if (convertTo) {
-      rates = await getExchangeRates('USD'); // Use USD as a stable base
+      rateData = await getExchangeRates('USD'); // Use USD as a stable base
     }
 
     const responseData = {
@@ -372,21 +429,33 @@ app.get('/api/scrape', async (req, res) => {
       keyword,
       domains: domainList,
       results: {},
-      ratesTimestamp: rates ? new Date().toISOString() : null,
+      conversionInfo: rateData ? {
+        timestamp: rateData.timestamp,
+        lastUpdate: rateData.lastUpdate,
+        base: rateData.base,
+        isFallback: rateData.isFallback || false
+      } : null,
     };
 
     for (const result of resultsByDomain) {
       const { domain, products } = result;
       const originalCurrency = AMAZON_DOMAINS[domain].currency;
 
-      if (convertTo && rates) {
+      if (convertTo && rateData) {
         products.forEach(p => {
           const priceMatch = p.price.match(/[\d,.]+/);
           if (priceMatch) {
             const amount = parseFloat(priceMatch[0].replace(/,/g, ''));
-            const convertedAmount = convertCurrency(amount, originalCurrency, convertTo.toUpperCase(), rates);
-            p.convertedPrice = convertedAmount ? `${convertTo.toUpperCase()} ${convertedAmount.toFixed(2)}` : 'N/A';
-            p.originalCurrency = originalCurrency;
+            const convertedAmount = convertCurrency(amount, originalCurrency, convertTo.toUpperCase(), rateData);
+            
+            if (convertedAmount) {
+              p.convertedPrice = `${convertTo.toUpperCase()} ${convertedAmount.toFixed(2)}`;
+              p.originalCurrency = originalCurrency;
+              p.originalPrice = p.price;
+              p.conversionRate = convertedAmount / amount; // Store the rate for reference
+            } else {
+              p.convertedPrice = 'N/A';
+            }
           }
         });
       }
@@ -410,19 +479,102 @@ app.get('/api/scrape', async (req, res) => {
 
 /**
  * API endpoint to get latest exchange rates
- * GET /api/rates
+ * GET /api/rates?base=USD
  */
 app.get('/api/rates', async (req, res) => {
   try {
     const { base } = req.query;
-    const rates = await getExchangeRates(base);
-    if (rates) {
-      res.json({ success: true, ...rates });
+    const rateData = await getExchangeRates(base);
+    if (rateData) {
+      res.json({ 
+        success: true, 
+        ...rateData 
+      });
     } else {
       res.status(500).json({ success: false, error: 'Failed to fetch exchange rates' });
     }
   } catch (error) {
     res.status(500).json({ success: false, error: 'Server error fetching rates' });
+  }
+});
+
+/**
+ * Test endpoint for currency conversion with mock data
+ * GET /api/test-conversion
+ */
+app.get('/api/test-conversion', async (req, res) => {
+  try {
+    const { convertTo = 'EUR' } = req.query;
+    
+    // Mock product data
+    const mockProducts = [
+      {
+        title: 'Sample Smartphone',
+        price: '$299.99',
+        rating: '4.5',
+        reviews: '1,234',
+        productUrl: 'https://amazon.com/test',
+        imageUrl: 'https://via.placeholder.com/200'
+      },
+      {
+        title: 'Wireless Headphones',
+        price: '$89.99',
+        rating: '4.2',
+        reviews: '567',
+        productUrl: 'https://amazon.com/test2',
+        imageUrl: 'https://via.placeholder.com/200'
+      }
+    ];
+
+    // Get exchange rates
+    const rateData = await getExchangeRates('USD');
+    
+    // Apply currency conversion
+    if (convertTo && rateData) {
+      mockProducts.forEach(p => {
+        const priceMatch = p.price.match(/[\d,.]+/);
+        if (priceMatch) {
+          const amount = parseFloat(priceMatch[0].replace(/,/g, ''));
+          const convertedAmount = convertCurrency(amount, 'USD', convertTo.toUpperCase(), rateData);
+          
+          if (convertedAmount) {
+            p.convertedPrice = `${convertTo.toUpperCase()} ${convertedAmount.toFixed(2)}`;
+            p.originalCurrency = 'USD';
+            p.originalPrice = p.price;
+            p.conversionRate = convertedAmount / amount;
+          } else {
+            p.convertedPrice = 'N/A';
+          }
+        }
+      });
+    }
+
+    const responseData = {
+      success: true,
+      keyword: 'test',
+      domains: ['amazon.com'],
+      results: {
+        'amazon.com': {
+          totalProducts: mockProducts.length,
+          products: mockProducts
+        }
+      },
+      conversionInfo: rateData ? {
+        timestamp: rateData.timestamp,
+        lastUpdate: rateData.lastUpdate,
+        base: rateData.base,
+        isFallback: rateData.isFallback || false
+      } : null,
+    };
+
+    res.json(responseData);
+  } catch (error) {
+    console.error('Test conversion error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Test conversion failed',
+      details: error.message
+    });
   }
 });
 

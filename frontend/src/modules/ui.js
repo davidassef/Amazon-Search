@@ -52,6 +52,11 @@ export class UI {
 
     this.currentKeyword = keyword || '';
 
+    // Display currency conversion info if available
+    if (data.conversionInfo) {
+      this.showConversionInfo(data.conversionInfo);
+    }
+
     if (isComparison) {
         this.renderComparisonView(data);
     } else {
@@ -69,6 +74,41 @@ export class UI {
     
     // Update filters summary
     this.updateFiltersSummary();
+  }
+
+  showConversionInfo(conversionInfo) {
+    // Create or update conversion info banner
+    let conversionBanner = document.getElementById('conversion-info-banner');
+    if (!conversionBanner) {
+      conversionBanner = document.createElement('div');
+      conversionBanner.id = 'conversion-info-banner';
+      conversionBanner.className = 'bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 rounded-md';
+      
+      const resultsSection = document.getElementById('results-section');
+      const resultsGrid = document.getElementById('results-grid');
+      resultsSection.insertBefore(conversionBanner, resultsGrid);
+    }
+
+    const statusIcon = conversionInfo.isFallback ? 
+      '⚠️' : '✅';
+    const statusText = conversionInfo.isFallback ? 
+      this.i18n.t('usingFallbackRates') || 'Using fallback exchange rates' :
+      this.i18n.t('usingLiveRates') || 'Using live exchange rates';
+
+    conversionBanner.innerHTML = `
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <span class="text-xl">${statusIcon}</span>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-blue-700">
+            <strong>${statusText}</strong><br>
+            ${this.i18n.t('ratesLastUpdated') || 'Exchange rates last updated'}: ${conversionInfo.lastUpdate}
+            ${conversionInfo.isFallback ? `<br><em>${this.i18n.t('fallbackRatesNote') || 'Note: Using approximate exchange rates due to API unavailability'}</em>` : ''}
+          </p>
+        </div>
+      </div>
+    `;
   }
 
   renderSingleGridView(products) {
@@ -138,8 +178,17 @@ export class UI {
     const reviewsText = this.formatReviews(product.reviews || 0);
 
     let priceHTML = '';
-    if (product.convertedPrice) {
-        priceHTML = `<div class="product-price">${product.convertedPrice}</div><div class="text-sm text-gray-500">${product.price}</div>`;
+    if (product.convertedPrice && product.convertedPrice !== 'N/A') {
+        // Show converted price prominently, original price smaller
+        const originalCurrency = product.originalCurrency || '';
+        const originalPrice = product.originalPrice || product.price;
+        priceHTML = `
+            <div class="product-price text-lg font-bold text-green-600">${product.convertedPrice}</div>
+            <div class="text-sm text-gray-500">
+                <span class="original-price">${originalPrice}</span>
+                ${originalCurrency ? `<span class="ml-1 text-xs">(${originalCurrency})</span>` : ''}
+            </div>
+        `;
     } else {
         priceHTML = `<div class="product-price">${product.price || this.i18n.t('priceNotAvailable')}</div>`;
     }
