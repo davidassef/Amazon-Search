@@ -453,12 +453,8 @@ class AmazonScraper {
             button.textContent = `${this.selectedCountries.length} ${this.i18n.t('regions')}`;
         }
 
-        const comparisonOptions = document.getElementById('comparison-options');
-        if (this.selectedCountries.length > 1) {
-            comparisonOptions.classList.remove('hidden');
-        } else {
-            comparisonOptions.classList.add('hidden');
-        }
+        // Currency conversion options are now always visible
+        // No need to hide/show based on country selection
     }
 
     // Render emojis as SVGs via Twemoji for cross-platform consistency
