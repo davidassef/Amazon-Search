@@ -82,7 +82,7 @@ export class UI {
     comparisonGrid.classList.add('hidden');
 
     resultsCount.textContent = this.i18n.t('resultsCount', { count: products.length });
-    resultsKeyword.textContent = ` ${this.i18n.t('resultsKeyword', { keyword: this.currentKeyword })}`;
+    resultsKeyword.textContent = this.i18n.t('resultsKeyword', { keyword: this.currentKeyword });
   }
 
   renderComparisonView(data) {
@@ -275,14 +275,14 @@ export class UI {
     if (minPrice) {
       activeFilters.push({
         key: 'minPrice',
-        label: `${this.i18n.t('minPrice')}: $${minPrice}`,
+        label: this.i18n.t('minPrice') + `: ${minPrice}`,
         value: minPrice
       });
     }
     if (maxPrice) {
       activeFilters.push({
         key: 'maxPrice',
-        label: `${this.i18n.t('maxPrice')}: $${maxPrice}`,
+        label: this.i18n.t('maxPrice') + `: ${maxPrice}`,
         value: maxPrice
       });
     }
@@ -292,7 +292,7 @@ export class UI {
     if (minRating) {
       activeFilters.push({
         key: 'minRating',
-        label: `${minRating}+ ${this.i18n.t('stars')}`,
+        label: this.i18n.t('ratingAndUp', { rating: minRating }),
         value: minRating
       });
     }
@@ -302,7 +302,7 @@ export class UI {
     if (brand && brand.trim().length > 0) {
       activeFilters.push({
         key: 'brand',
-        label: `${this.i18n.t('brand')}: ${brand.trim()}`,
+        label: this.i18n.t('brand') + `: ${brand.trim()}`,
         value: brand.trim()
       });
     }
@@ -342,7 +342,7 @@ export class UI {
                 <button 
                   class="ml-1 text-blue-500 hover:text-blue-700 focus:outline-none"
                   data-filter-key="${filter.key}"
-                  aria-label="${this.i18n.t('removeFilter')}"
+                  aria-label="${this.i18n.t('removeFilter', { filter: filter.label })}"
                 >
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

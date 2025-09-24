@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Amazon Product Scraper - Search for products on Amazon and view results">
-    <title>Amazon Product Scraper</title>
+    <meta name="description" content="" data-i18n-content="metaDescription">
+    <title data-i18n="pageTitle">Amazon Product Scraper</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="stylesheet" href="src/styles.css">
 </head>
@@ -163,10 +163,10 @@
                             <label for="min-rating" class="block text-sm font-medium text-gray-700" data-i18n="minRating">Minimum Rating</label>
                             <select id="min-rating" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange">
                                 <option value="" data-i18n="anyRating">Any Rating</option>
-                                <option value="4">4+ stars & Up</option>
-                                <option value="3">3+ stars & Up</option>
-                                <option value="2">2+ stars & Up</option>
-                                <option value="1">1+ stars & Up</option>
+                                <option value="4" data-i18n="rating4stars">4+ stars & Up</option>
+                                <option value="3" data-i18n="rating3stars">3+ stars & Up</option>
+                                <option value="2" data-i18n="rating2stars">2+ stars & Up</option>
+                                <option value="1" data-i18n="rating1star">1+ star & Up</option>
                             </select>
                         </div>
                         
@@ -180,8 +180,8 @@
                         <div class="space-y-2">
                             <label class="block text-sm font-medium text-gray-700" data-i18n="dateRange">Date Range</label>
                             <div class="flex flex-col gap-2">
-                                <input type="date" id="date-from" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange" aria-label="Start date" data-i18n-placeholder="startDate">
-                                <input type="date" id="date-to" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange" aria-label="End date" data-i18n-placeholder="endDate">
+                                <input type="date" id="date-from" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange" aria-label="Start date" data-i18n-placeholder="startDate" data-i18n-aria-label="startDate">
+                                <input type="date" id="date-to" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amazon-orange focus:border-amazon-orange" aria-label="End date" data-i18n-placeholder="endDate" data-i18n-aria-label="endDate">
                             </div>
                         </div>
 
@@ -196,7 +196,7 @@
                         <!-- Botão Aplicar Filtros -->
                         <div class="flex items-end">
                             <button type="submit" id="apply-filters" class="w-full bg-amazon-orange hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-md transition-colors" data-i18n="applyFilters">
-                                <span data-i18n="applyFilters">Apply Filters</span>
+                                Apply Filters
                             </button>
                         </div>
                     </div>
@@ -224,7 +224,7 @@
                     </svg>
                 </div>
                 <p id="error-message" class="text-red-700 font-medium"></p>
-                <button id="retry-button" class="mt-4 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                <button id="retry-button" data-i18n="tryAgain" class="mt-4 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
                     Try Again
                 </button>
             </div>
