@@ -59,6 +59,7 @@
   "resetFilters": "Redefinir Filtros",
   "anyRating": "Qualquer Avaliação",
   "removeFilter": "Remover filtro",
-  "convertCurrency": "Converter para"
+  "convertCurrency": "Converter para",
+  "comparisonTitleWithKeyword": "Comparando resultados para \\"{{keyword}}\\""
 }
 

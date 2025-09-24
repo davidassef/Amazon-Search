@@ -60,6 +60,7 @@
   "resetFilters": "Reset Filters",
   "anyRating": "Any Rating",
   "removeFilter": "Remove filter",
-  "convertCurrency": "Convert to"
+  "convertCurrency": "Convert to",
+  "comparisonTitleWithKeyword": "Comparing results for \\"{{keyword}}\\""
 }
 
