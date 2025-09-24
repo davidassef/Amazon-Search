@@ -178,19 +178,32 @@ export class UI {
     const reviewsText = this.formatReviews(product.reviews || 0);
 
     let priceHTML = '';
-    if (product.convertedPrice && product.convertedPrice !== 'N/A') {
+    
+    // Enhanced currency conversion display with better validation
+    if (product.convertedPrice && 
+        product.convertedPrice !== 'N/A' && 
+        product.convertedPrice !== null && 
+        product.convertedPrice !== undefined &&
+        product.convertedPrice.trim() !== '') {
+        
         // Show converted price prominently, original price smaller
         const originalCurrency = product.originalCurrency || '';
         const originalPrice = product.originalPrice || product.price;
+        
         priceHTML = `
-            <div class="product-price text-lg font-bold text-green-600">${product.convertedPrice}</div>
-            <div class="text-sm text-gray-500">
+            <div class="product-price text-lg font-bold text-green-600" title="Converted price">${product.convertedPrice}</div>
+            <div class="text-sm text-gray-500" title="Original price">
                 <span class="original-price">${originalPrice}</span>
                 ${originalCurrency ? `<span class="ml-1 text-xs">(${originalCurrency})</span>` : ''}
             </div>
         `;
     } else {
-        priceHTML = `<div class="product-price">${product.price || this.i18n.t('priceNotAvailable')}</div>`;
+        // Fallback to original price with clearer indication when conversion was attempted but failed
+        const priceDisplayText = product.price || this.i18n.t('priceNotAvailable');
+        const failedConversionNote = (product.convertedPrice === 'N/A') ? 
+            ` title="Currency conversion not available"` : '';
+        
+        priceHTML = `<div class="product-price"${failedConversionNote}>${priceDisplayText}</div>`;
     }
 
     return `
