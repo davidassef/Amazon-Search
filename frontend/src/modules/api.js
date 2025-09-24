@@ -64,6 +64,10 @@ export class API {
     const params = new URLSearchParams({ keyword, domains });
     if (convertTo) {
       params.append('convertTo', convertTo);
+      // Debug logging for currency conversion requests (only in development)
+      if (window.location.hostname === 'localhost') {
+        console.debug('Currency conversion requested:', { keyword, convertTo, domains });
+      }
     }
     const url = `${this.baseURL}/scrape?${params.toString()}`;
 
@@ -164,6 +168,16 @@ export class API {
       const convertedPrice = item.convertedPrice ?? null;
       const originalCurrency = item.originalCurrency ?? null;
       const originalPrice = item.originalPrice ?? null;
+
+      // Debug logging for currency conversion (only in development)
+      if (convertedPrice && convertedPrice !== 'N/A' && window.location.hostname === 'localhost') {
+        console.debug('Currency conversion applied:', {
+          title: title.substring(0, 30) + '...',
+          originalPrice,
+          convertedPrice,
+          originalCurrency
+        });
+      }
 
       // Normalize rating a partir de múltiplas chaves
       const rating = this.extractRating(item);
