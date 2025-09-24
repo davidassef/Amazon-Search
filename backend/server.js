@@ -25,14 +25,14 @@ app.use(express.json());
 
 // Amazon domain configuration
 const AMAZON_DOMAINS = {
-  'amazon.com': { baseUrl: 'https://www.amazon.com', language: 'en-US,en;q=0.9' },
-  'amazon.co.uk': { baseUrl: 'https://www.amazon.co.uk', language: 'en-GB,en;q=0.9' },
-  'amazon.de': { baseUrl: 'https://www.amazon.de', language: 'de-DE,de;q=0.9,en;q=0.8' },
-  'amazon.fr': { baseUrl: 'https://www.amazon.fr', language: 'fr-FR,fr;q=0.9,en;q=0.8' },
-  'amazon.ca': { baseUrl: 'https://www.amazon.ca', language: 'en-CA,en;q=0.9,fr;q=0.8' },
-  'amazon.com.au': { baseUrl: 'https://www.amazon.com.au', language: 'en-AU,en;q=0.9' },
-  'amazon.co.jp': { baseUrl: 'https://www.amazon.co.jp', language: 'ja-JP,ja;q=0.9,en;q=0.8' },
-  'amazon.in': { baseUrl: 'https://www.amazon.in', language: 'en-IN,en;q=0.9,hi;q=0.8' },
+  'amazon.com': { baseUrl: 'https://www.amazon.com', language: 'en-US,en;q=0.9', currency: 'USD' },
+  'amazon.co.uk': { baseUrl: 'https://www.amazon.co.uk', language: 'en-GB,en;q=0.9', currency: 'GBP' },
+  'amazon.de': { baseUrl: 'https://www.amazon.de', language: 'de-DE,de;q=0.9,en;q=0.8', currency: 'EUR' },
+  'amazon.fr': { baseUrl: 'https://www.amazon.fr', language: 'fr-FR,fr;q=0.9,en;q=0.8', currency: 'EUR' },
+  'amazon.ca': { baseUrl: 'https://www.amazon.ca', language: 'en-CA,en;q=0.9,fr;q=0.8', currency: 'CAD' },
+  'amazon.com.au': { baseUrl: 'https://www.amazon.com.au', language: 'en-AU,en;q=0.9', currency: 'AUD' },
+  'amazon.co.jp': { baseUrl: 'https://www.amazon.co.jp', language: 'ja-JP,ja;q=0.9,en;q=0.8', currency: 'JPY' },
+  'amazon.in': { baseUrl: 'https://www.amazon.in', language: 'en-IN,en;q=0.9,hi;q=0.8', currency: 'INR' },
   'amazon.com.br': { baseUrl: 'https://www.amazon.com.br', language: 'pt-BR,pt;q=0.9,en;q=0.8', currency: 'BRL' },
   'amazon.com.mx': { baseUrl: 'https://www.amazon.com.mx', language: 'es-MX,es;q=0.9,en;q=0.8', currency: 'MXN' },
   'amazon.it': { baseUrl: 'https://www.amazon.it', language: 'it-IT,it;q=0.9,en;q=0.8', currency: 'EUR' },

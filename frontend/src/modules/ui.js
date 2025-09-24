@@ -54,15 +54,14 @@ export class UI {
 
     if (isComparison) {
         this.renderComparisonView(data);
-        document.getElementById('filter-toggle').classList.add('hidden');
-        document.getElementById('sort-by').classList.add('hidden');
     } else {
         const products = data.results ? Object.values(data.results)[0].products : [];
         this.currentResults = products;
         this.renderSingleGridView(products);
-        document.getElementById('filter-toggle').classList.remove('hidden');
-        document.getElementById('sort-by').classList.remove('hidden');
     }
+    // Always ensure filters are visible when results are shown
+    document.getElementById('filter-toggle').classList.remove('hidden');
+    document.getElementById('sort-by').classList.remove('hidden');
 
     // Show section
     resultsSection.classList.remove('hidden');
@@ -100,15 +99,18 @@ export class UI {
     // Create a flex container for the columns
     let columnsHTML = '<div class="flex flex-col md:flex-row gap-6">';
 
-    domains.forEach(domain => {
+    domains.forEach((domain, index) => {
       const result = data.results[domain];
       const products = result.products || [];
 
+      // Add a separator for all columns except the first one
+      const separatorClass = index > 0 ? 'md:border-l md:border-gray-200 md:pl-6' : '';
+
       // Start column
-      columnsHTML += '<div class="flex-1 min-w-0">';
+      columnsHTML += `<div class="flex-1 min-w-0 ${separatorClass}">`;
 
       // Column Header
-      columnsHTML += `<h3 class="text-xl font-bold text-center mb-4">${domain}</h3>`;
+      columnsHTML += `<h3 class="text-lg font-bold text-center mb-4 p-2 bg-yellow-400 text-white rounded-t-lg" style="text-shadow: 1px 1px 1px #000;">${domain}</h3>`;
 
       // Products Grid for this column
       columnsHTML += '<div class="grid grid-cols-1 gap-6">';
