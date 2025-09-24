@@ -60,6 +60,11 @@
   "anyRating": "Qualquer Avaliação",
   "removeFilter": "Remover filtro",
   "convertCurrency": "Converter para",
-  "comparisonTitleWithKeyword": "Comparando resultados para \\"{{keyword}}\\""
+  "comparisonTitleWithKeyword": "Comparando resultados para \"{{keyword}}\"",
+  "pageTitle": "Buscador de Produtos Amazon",
+  "metaDescription": "Busque produtos na Amazon e veja os resultados da primeira página",
+  "footerTech": "Construído com Bun, Vite e Tailwind CSS",
+  "footerFeatures": "12 Países • Dados em Tempo Real",
+  "footerCopyright": "© 2025 • Apenas para fins educacionais"
 }
 

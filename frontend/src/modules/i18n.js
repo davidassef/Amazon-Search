@@ -22,6 +22,8 @@ export class I18n {
     this.defaults = {
       en: {
         title: 'Amazon Product Scraper',
+        pageTitle: 'Amazon Product Scraper',
+        metaDescription: 'Search for products on Amazon and view the first page results',
         language: 'Language',
         searchTitle: 'Find products on Amazon',
         searchSubtitle: 'Enter a product name and select your preferred Amazon country',
@@ -72,6 +74,9 @@ export class I18n {
         keywordRequired: 'Please enter a keyword',
         keywordTooShort: 'Keyword is too short',
         noProductsError: 'No products found for "{{keyword}}"',
+        footerTech: 'Built with Bun, Vite & Tailwind CSS',
+        footerFeatures: '12 Countries • Real-time Data',
+        footerCopyright: '© 2025 • Educational purposes only',
         // Optional country keys
         'country.us': 'United States', 'country.ca': 'Canada', 'country.uk': 'United Kingdom',
         'country.de': 'Germany', 'country.fr': 'France', 'country.es': 'Spain', 'country.it': 'Italy',
@@ -79,6 +84,8 @@ export class I18n {
       },
       pt: {
         title: 'Amazon Product Scraper',
+        pageTitle: 'Buscador de Produtos Amazon',
+        metaDescription: 'Busque produtos na Amazon e veja os resultados da primeira página',
         language: 'Idioma',
         searchTitle: 'Encontre produtos na Amazon',
         searchSubtitle: 'Digite um produto e selecione o país da Amazon',
@@ -129,12 +136,17 @@ export class I18n {
         keywordRequired: 'Digite uma palavra-chave',
         keywordTooShort: 'Palavra-chave muito curta',
         noProductsError: 'Nenhum produto encontrado para "{{keyword}}"',
+        footerTech: 'Construído com Bun, Vite e Tailwind CSS',
+        footerFeatures: '12 Países • Dados em Tempo Real',
+        footerCopyright: '© 2025 • Apenas para fins educacionais',
         'country.us': 'Estados Unidos', 'country.ca': 'Canadá', 'country.uk': 'Reino Unido',
         'country.de': 'Alemanha', 'country.fr': 'França', 'country.es': 'Espanha', 'country.it': 'Itália',
         'country.jp': 'Japão', 'country.au': 'Austrália', 'country.in': 'Índia', 'country.br': 'Brasil', 'country.mx': 'México'
       },
       es: {
         title: 'Amazon Product Scraper',
+        pageTitle: 'Buscador de Productos Amazon',
+        metaDescription: 'Busca productos en Amazon y ve los resultados de la primera página',
         language: 'Idioma',
         searchTitle: 'Encuentra productos en Amazon',
         searchSubtitle: 'Ingresa un producto y selecciona el país de Amazon',
@@ -185,6 +197,9 @@ export class I18n {
         keywordRequired: 'Ingresa una palabra clave',
         keywordTooShort: 'La palabra clave es muy corta',
         noProductsError: 'No se encontraron productos para "{{keyword}}"',
+        footerTech: 'Construido con Bun, Vite y Tailwind CSS',
+        footerFeatures: '12 Países • Datos en Tiempo Real',
+        footerCopyright: '© 2025 • Solo para fines educativos',
         'country.us': 'Estados Unidos', 'country.ca': 'Canadá', 'country.uk': 'Reino Unido',
         'country.de': 'Alemania', 'country.fr': 'Francia', 'country.es': 'España', 'country.it': 'Italia',
         'country.jp': 'Japón', 'country.au': 'Australia', 'country.in': 'India', 'country.br': 'Brasil', 'country.mx': 'México'
@@ -260,6 +275,19 @@ export class I18n {
       const key = el.getAttribute('data-i18n-placeholder');
       el.setAttribute('placeholder', this.t(key));
     });
+
+    // Elements with data-i18n-content (for meta descriptions, etc.)
+    document.querySelectorAll('[data-i18n-content]').forEach(el => {
+      const key = el.getAttribute('data-i18n-content');
+      el.setAttribute('content', this.t(key));
+    });
+
+    // Update document title if there's a title element with data-i18n
+    const titleElement = document.querySelector('title[data-i18n]');
+    if (titleElement) {
+      const key = titleElement.getAttribute('data-i18n');
+      document.title = this.t(key);
+    }
 
     // Debug: verificar idioma e valores aplicados de min/max price
     try {

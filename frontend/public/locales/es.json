@@ -59,6 +59,12 @@
   "noResults": "No se encontraron productos con los filtros seleccionados.",
   "resetFilters": "Restablecer Filtros",
   "anyRating": "Cualquier Calificación",
-  "removeFilter": "Eliminar filtro"
+  "removeFilter": "Eliminar filtro",
+  "comparisonTitleWithKeyword": "Comparando resultados para \"{{keyword}}\"",
+  "pageTitle": "Buscador de Productos Amazon", 
+  "metaDescription": "Busca productos en Amazon y ve los resultados de la primera página",
+  "footerTech": "Construido con Bun, Vite y Tailwind CSS",
+  "footerFeatures": "12 Países • Datos en Tiempo Real",
+  "footerCopyright": "© 2025 • Solo para fines educativos"
 }
 
